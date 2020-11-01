@@ -6,10 +6,10 @@
 
 using namespace std;
 
-
 class String
 {
 public:
+    typedef char* iterator;
     String(const char* str = "")
     {
         if(str == NULL)
@@ -41,6 +41,15 @@ public:
         return *this;
     }
 
+    iterator begin()
+    {
+        return _str;
+    }
+
+    iterator end()
+    {
+        return _str+_size;
+    }
     size_t size()
     {
         return _size;
@@ -256,7 +265,6 @@ private:
     size_t _size;
     size_t _capacity;
 };
-
 
 int main()
 {
