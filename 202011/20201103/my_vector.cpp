@@ -1,3 +1,4 @@
+#include<assert.h>
 #include<iostream>
 
 
@@ -14,7 +15,7 @@ class Vector
              ,endofstorage(nullptr)
         {}
         
-        Vector(size_t n,const T& date = T())
+        Vector(int n,const T& date = T())
             :start(new T[n])
              ,finish(start)
              ,endofstorage(start+n)
@@ -202,7 +203,7 @@ class Vector
         void push_back(const T& date)
         {
             if(size()==capacity())
-                reserve(2*capacity());
+                reserve(2*capacity()+2);
             *finish++ = date;
         }
         void pop_back()
@@ -322,15 +323,146 @@ class Vector
         {
             finish = start;
         }
-
     private:
         iterator start;
         iterator finish;
         iterator endofstorage;
 };
+/*-------------------------------测试----------------
+ */
+#include<string>
+using namespace std;
+void TestVector1()
+{
+    Vector<int> v1;
+    Vector<int> v2(2,10);
+    for(size_t i = 0;i<v2.size();++i)
+    {
+        cout<<v2[i]<<" ";
+    }
+    cout<<endl;
+    int array[] = {1,2,3,4,5,6};
+    Vector<int> v3(array,array+6);
+    auto it = v3.begin();
+    while(it!=v3.end())
+    {
+        cout<<*it<<" ";
+        it++;
+    }
+    cout<<endl;
 
+    std::string s("hello world");
+    Vector<char> vc(s.begin(),s.end());
+    Vector<int> v4(v2);
+    for(auto e : v4)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+}
+
+void TestVector2()
+{
+    Vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(4);
+    v.push_back(5);
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+    v.pop_back();
+    v.pop_back();
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+    v.insert(v.begin(),0);
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+    v.earse(v.begin());
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+    v.clear();
+    cout<<v.size()<<endl;
+    cout<<v.capacity()<<endl;
+
+}
+
+void TestVector3()
+{
+    Vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(4);
+    v.push_back(5);
+    cout<<v[0]<<endl;
+    cout<<v.front()<<endl;
+    cout<<v.back()<<endl;
+    //capacity: 6
+    cout<<v.size()<<endl;
+    cout<<v.capacity()<<endl;
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+    
+    v.resize(10);
+    cout<<v.size()<<endl;
+    cout<<v.capacity()<<endl;
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+
+    v.resize(3);
+    cout<<v.size()<<endl;
+    cout<<v.capacity()<<endl;
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+
+    v.reserve(20);
+    cout<<v.size()<<endl;
+    cout<<v.capacity()<<endl;
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+    
+    v.reserve(10);
+    cout<<v.size()<<endl;
+    cout<<v.capacity()<<endl;
+    for(auto e : v)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
+
+
+
+}
 
 int main()
 {
+    // TestVector1();
+    // TestVector2();
+    TestVector3();
     return 0;
 }
