@@ -15,10 +15,71 @@ struct ListNode
     T date;
 };
 
+
+template<class T>
+struct ListIterator
+{
+    typedef ListNode<T> Node;
+    typedef ListIterator Self;
+    public:
+    ListIterator()
+        :_ptr(nullptr)
+    {}
+     
+    ListIterator(const Self& s)
+    {
+        _ptr = s._ptr;
+    }
+    T& operator*()
+    {
+        return _ptr->date;
+    }
+    T* operator->()
+    {
+        return &_ptr->date;
+    }
+    Self& operator++()
+    {
+        _ptr=_ptr->next;
+        return *this;
+    }
+    Self operator++(int)
+    {
+        Self temp(*this);
+        _ptr=_ptr->next;
+        return temp;
+    }
+    Self& operator--()
+    {
+        _ptr=_ptr->prev;
+        return *this;
+    }
+    Self operator--(int)
+    {
+        Self temp(*this);
+        _ptr=_ptr->prev;
+        return temp;
+    }
+    ///////////////
+    //比较
+    bool operator!=(const Self& s)const
+    {
+        return _ptr!= s._ptr;
+    }
+    bool operator==(const Self& s)const
+    {
+        return _ptr==s._ptr;
+    }
+    Node* _ptr; 
+};
+
+
+
 template<class T>
 class List
 {
     typedef ListNode<T> Node;
+    typedef ListIterator<T> iterator;
     public:
         List()
         {
@@ -43,7 +104,7 @@ class List
                 ++first;
             }
         }
-        List(const List<T>& L)
+        List( List<T>& L)
         {
             auto it = L.begin();
             while(it!=L.end())
@@ -64,11 +125,11 @@ class List
         //iterator
         iterator begin()
         {
-            return head->next;
+            return iterator(head->next);
         }
         iterator end()
         {
-            return head;
+            return iterator(head);
         }
 
         //////////////////////////
@@ -111,30 +172,75 @@ class List
        //access
        const T& front()const
        {
-           return *begin;
+           return *begin();
        }
        T& front()
        {
-           return *begin;
+           return *begin();
        }
        T& back()
        {
-            return *(--end);
+            return *(--end());
        }
        const T& back()const
        {
-            return *(--end);
+            return *(--end());
        }
         //////////////////
         //
-        void push_back(T& date);
-        void pop_back();
-        void push_front(T& date);
-        void pop_front();
-        void insert(iterator pos,T& date);
-        void erase(iterator pos);
-        void clear();
-        void swap();
+        void push_back(T& date)
+        {
+            insert(end(),date);
+        }
+        void pop_back()
+        {
+            erase(--end());
+        }
+        void push_front(T& date)
+        {
+            insert(begin(),date);
+        }
+        void pop_front()
+        {
+            erase(begin());
+        }
+        iterator insert(iterator pos,const T& date)
+        {
+            Node* cur = new Node(date);
+            cur->next = pos._ptr;
+            cur->prev = pos._ptr->prev;
+            pos._ptr->prev = cur;
+            cur->prev->next = cur;
+            return iterator(cur);
+        }
+        iterator erase(iterator pos)
+        {
+            Node* cur = pos._ptr;
+            Node* ret = pos._ptr->next;
+            if(cur != head)
+            {
+                cur->next->prev = cur->prev;
+                cur->prev->next = cur->next;
+                delete cur;
+            }
+            return iterator(ret);
+        }
+        iterator erase(iterator first,iterator last)
+        {
+            while(first!=last)
+            {
+                first = erase(first);
+            }
+            return last;            
+        }
+        void clear()
+        {
+            erase(begin(),end());
+        }
+        void swap(List<T>& L)
+        {
+            std::swap(head,L.head);
+        }
     private:
         void CreatHead()
         {
@@ -145,3 +251,18 @@ class List
     private:
         Node* head;
 };
+
+void TestList1()
+{
+    List<int> L1;
+    List<int> L2(3,10);
+    cout<<L2.size()<<endl;
+    int array[] = {1,2,3};
+    List<int> L3(array,array+3);
+}
+
+int main()
+{
+    TestList1();
+    return 0;
+}
