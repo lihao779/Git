@@ -74,6 +74,57 @@ struct ListIterator
     Node* _ptr; 
 };
 
+template<class T,class Iterator>
+struct ListReverseIterator
+{
+    typedef ListReverseIterator<T,Iterator> Self;
+    typedef ListNode<T> Node;
+    ListReverseIterator(Node* pNode = nullptr)
+        :_it(pNode)
+    {}
+    
+    T& operator*()
+    {
+        Iterator temp(_it);
+        --temp;
+        *temp;
+    }
+    T* operator->()
+    {
+        return &(*_it);
+    }
+    Self& operator++()
+    {
+        --_it;
+        return *this;
+    }
+    Self operator++(int)
+    {
+        _it--;
+        return *this;
+    }
+    Self& operator--()
+    {
+        ++_it;
+        return *this;
+    }
+    Self operator--(int)
+    {
+        _it++;
+        return *this;
+    }
+    bool operator==(const Self& s)
+    {
+        return _it._ptr==s._ptr;
+    }
+
+    bool operator!=(const Self& s)
+    {
+        return _it._ptr!=s._ptr;
+    }
+    Iterator _it;
+
+};
 
 
 template<class T>
@@ -107,6 +158,7 @@ class List
         }
         List( List<T>& L)
         {
+            CreatHead();
             auto it = L.begin();
             while(it!=L.end())
             {
@@ -282,21 +334,44 @@ void TestList2()
     L.push_back(5);
     cout<<L.front()<<endl;
     cout<<L.back()<<endl;
-
+    L.resize(10,10);
+    auto it = L.begin();
+    while(it!=L.end())
+    {
+        cout<<*it<<" ";
+        ++it;
+    }
+    cout<<endl;
     L.pop_back();
     L.pop_front();
     cout<<L.front()<<endl;
     cout<<L.back()<<endl;
     
+    //好像不行
     //L.insert(find(L.begin(),L.end(),3),100);
     //L.erase(find(L.begin(),L.end(),100));
     L.clear();
     cout<<L.size()<<endl;
 
 }
+struct A
+{
+    int a;
+    int b;
+    int c;
+};
+void TestList3()
+{
+    List<A> L;
+    A a{1,2,3};
+    L.push_back(a);
+    auto it = L.begin();
+    it->a = 10;
+}
 int main()
 {
     // TestList1();
-    TestList2();
+    // TestList2();
+    TestList3();
     return 0;
 }
