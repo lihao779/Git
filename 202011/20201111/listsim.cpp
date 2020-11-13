@@ -1,4 +1,5 @@
 #include<iostream>
+#include<algorithm>
 
 using namespace std;
 
@@ -22,8 +23,8 @@ struct ListIterator
     typedef ListNode<T> Node;
     typedef ListIterator Self;
     public:
-    ListIterator()
-        :_ptr(nullptr)
+    ListIterator( Node* ptr = nullptr)
+        :_ptr(ptr)
     {}
      
     ListIterator(const Self& s)
@@ -86,7 +87,7 @@ class List
             CreatHead();
         }
 
-        List(size_t n,const T& date = T())
+        List(int  n,const T& date = T())
         {
             CreatHead();
             for(size_t i = 0;i < n;++i)
@@ -188,7 +189,7 @@ class List
        }
         //////////////////
         //
-        void push_back(T& date)
+        void push_back(T date)
         {
             insert(end(),date);
         }
@@ -257,12 +258,45 @@ void TestList1()
     List<int> L1;
     List<int> L2(3,10);
     cout<<L2.size()<<endl;
+    for(auto e: L2)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
     int array[] = {1,2,3};
     List<int> L3(array,array+3);
+    for(auto e: L2)
+    {
+        cout<<e<<" ";
+    }
+    cout<<endl;
 }
 
+void TestList2()
+{
+    List<int> L;
+    L.push_back(1);
+    L.push_back(2);
+    L.push_back(3);
+    L.push_back(4);
+    L.push_back(5);
+    cout<<L.front()<<endl;
+    cout<<L.back()<<endl;
+
+    L.pop_back();
+    L.pop_front();
+    cout<<L.front()<<endl;
+    cout<<L.back()<<endl;
+    
+    //L.insert(find(L.begin(),L.end(),3),100);
+    //L.erase(find(L.begin(),L.end(),100));
+    L.clear();
+    cout<<L.size()<<endl;
+
+}
 int main()
 {
-    TestList1();
+    // TestList1();
+    TestList2();
     return 0;
 }
