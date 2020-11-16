@@ -37,3 +37,15 @@ namespace bite
             std::vector<T> v_;
     };
 }
+
+int main()
+{
+    bite::stack<int> s;
+    s.push(1);
+    s.push(2);
+    std::cout<<s.top()<<std::endl;
+    s.top() = 3;
+    std::cout<<s.top()<<std::endl;
+
+    return 0;
+}
