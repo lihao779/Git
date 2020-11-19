@@ -16,8 +16,6 @@ class Date
         {
             handler_(date_);
         }
-        
-
     private:
         int date_;
         Handler handler_; 
