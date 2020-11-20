@@ -57,6 +57,7 @@ class ThreadPool
         pthread_mutex_lock(&mutex_);
         while(que_.size()==capacity_)
         {
+            pthread_mutex_unlock(&mutex_);
             return ;
         }
         que_.push(date);
@@ -96,11 +97,14 @@ class ThreadPool
        {
            Date* d;
            pthread_mutex_lock(&tp->mutex_);
+           while(tp->que_.empty())
+           {
+                pthread_cond_wait(&tp->cond_,&tp->mutex_);
+           }
            tp->Pop(&d);
            pthread_mutex_unlock(&tp->mutex_);
            d->Run();
            delete d;
-           sleep(1);
        }
     }
     private:
@@ -121,6 +125,12 @@ int main()
     if(ret < 0)
     {
         printf("失败\n");
+    }
+    for(int i = 0;i<200;i++)
+    {
+        Date* d = new Date(i,handler);
+        tp->Push(d);
+        usleep(1000);
     }
     tp->Jointhread();
      delete tp; 
