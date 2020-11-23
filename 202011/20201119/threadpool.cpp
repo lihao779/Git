@@ -35,12 +35,15 @@ class ThreadPool
         ,thread_count_(thread_count)
         ,vec_(thread_count)
     {
+        flag = false;
         pthread_mutex_init(&mutex_,NULL);
+        pthread_mutex_init(&flag_mutex_,NULL);
         pthread_cond_init(&cond_,NULL);
     }
     ~ThreadPool()
     {
         pthread_mutex_destroy(&mutex_);
+        pthread_mutex_destroy(&flag_mutex_);
         pthread_cond_destroy(&cond_);
     }
     int Oninit()
@@ -55,6 +58,11 @@ class ThreadPool
     void Push(Date* date)
     {
         pthread_mutex_lock(&mutex_);
+        if(flag)
+        {
+            pthread_mutex_unlock(&mutex_);
+            return ;
+        }
         while(que_.size()==capacity_)
         {
             pthread_mutex_unlock(&mutex_);
@@ -76,6 +84,13 @@ class ThreadPool
         {
             pthread_join(vec_[i],NULL);
         }
+    }
+    void Threadpool_Exit()
+    {
+        pthread_mutex_lock(&flag_mutex_);
+        flag = true;
+        pthread_mutex_unlock(&flag_mutex_);
+        pthread_cond_broadcast(&cond_);
     }
     private:
     int CreateThread()
@@ -99,6 +114,12 @@ class ThreadPool
            pthread_mutex_lock(&tp->mutex_);
            while(tp->que_.empty())
            {
+               if(tp->flag)
+               {
+                   tp->thread_count_--;
+                   pthread_mutex_unlock(&tp->mutex_);
+                   pthread_exit(NULL);
+               }
                 pthread_cond_wait(&tp->cond_,&tp->mutex_);
            }
            tp->Pop(&d);
@@ -114,6 +135,8 @@ class ThreadPool
         int capacity_;
         int thread_count_;
         std::vector<pthread_t> vec_;
+        pthread_mutex_t flag_mutex_;
+        int flag;
 };
 
 
@@ -132,7 +155,10 @@ int main()
         tp->Push(d);
         usleep(1000);
     }
+    
+    sleep(4);
+    tp->Threadpool_Exit();
     tp->Jointhread();
-     delete tp; 
+    delete tp; 
     return 0;
 }
