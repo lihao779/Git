@@ -30,9 +30,9 @@ int main()
     {
       //接收消息
       char buf[1024] = {0};
-      struct sockaddr peer_addr;
-      socklen_t peer_len;
-      ssize_t recv_size = recvfrom(sockfd,buf,sizeof(buf)-1,0,&peer_addr,&peer_len);
+      struct sockaddr_in peer_addr;
+      socklen_t peer_len  = sizeof(peer_addr);
+      ssize_t recv_size = recvfrom(sockfd,buf,sizeof(buf)-1,0,(struct sockaddr*)&peer_addr,&peer_len);
       if(recv_size<0)
       {
           perror("recvfrom");
@@ -41,12 +41,12 @@ int main()
       printf("client:%s\n",buf);
       memset(buf,0,sizeof(buf));
         
-      
       printf("server:");
       fflush(stdout);
       std::cin>>buf;
       //回复消息
-      ssize_t send_size = sendto(sockfd,&buf,strlen(buf),0,&peer_addr,peer_len);
+     
+      ssize_t send_size = sendto(sockfd,buf,strlen(buf),0,(struct sockaddr*)&peer_addr,peer_len);
       if(send_size<0)
       {
           perror("sendto");
