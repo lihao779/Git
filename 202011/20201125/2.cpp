@@ -33,8 +33,10 @@ class Derived : public Base
         {
             cout<<"~Derived"<<endl;
         }
+        static int c;
         int _d;
 };
+int Derived::c = 1;
 
 int main()
 {
