@@ -42,6 +42,7 @@ int main()
     }
     while(1)
     {
+        sleep(3);
         char buf[1024] = {0};
         ret = recv(sockfd,buf,sizeof(buf)-1,0);
         if(ret < 0)
