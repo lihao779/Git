@@ -16,7 +16,7 @@ int main()
     //绑定
     struct sockaddr_in addr; 
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(1999);
+    addr.sin_port = htons(19999);
     //addr.sin_addr.s_addr = inet_addr("0.0.0.0");
     addr.sin_addr.s_addr = inet_addr("192.168.40.131");
 
