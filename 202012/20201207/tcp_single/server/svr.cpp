@@ -4,11 +4,20 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <signal.h>
 #include <iostream>
 #include <sstream>
 
+void sigcb(int arg)
+{
+    std::cout<<arg<<std::endl;
+    _exit(0); 
+}
+
 int main()
 {
+
+    signal(SIGPIPE,sigcb);
     int listen_sock = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
     if(listen_sock < 0)
     {
@@ -74,6 +83,7 @@ int main()
         ss << "HTTP/1.1 200 OK\r\n";
         ss << "Content-Type: text/html\r\n";
         ss << "Content-Length: "<<body.size()<<"\r\n";
+        ss << "Connection: keep-alive\r\n";
         ss << "\r\n";
         ret = send(sockfd,ss.str().c_str(),ss.str().size(),0);
     //    if(ret < 0)
