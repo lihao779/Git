@@ -30,7 +30,7 @@ int main()
         printf("cli:");
         char buf[1024] = {0};
         std::cin >> buf;
-        ret = send(sockfd,buf,strlen(buf),0);
+        ret = send(sockfd,buf,strlen(buf),MSG_OOB);
         if(ret < 0)
         {
             perror("send");

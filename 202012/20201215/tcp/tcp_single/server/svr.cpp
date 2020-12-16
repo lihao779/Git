@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string.h>
@@ -51,6 +52,7 @@ int main()
         close(listen_sock);
         return -1;
     }
+    fcntl(sockfd,F_SETOWN,getpid());
     while(1)
     {
         char buf[1024] = {0};
