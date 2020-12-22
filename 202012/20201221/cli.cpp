@@ -7,6 +7,7 @@
 #include <iostream>
 #include <malloc.h>
 #include "../App.hpp"
+
 int main()
 {
     
@@ -27,19 +28,24 @@ int main()
         close(sockfd);
         return -1;
     }
-    char ch = '1'; 
     int count = 1;
     while(1)
     {
-        ret = send(sockfd,&ch,sizeof(char),0);
+        char buf[1024] = {0};
+        strcpy(buf,"i");
+        ret = send(sockfd,buf,strlen(buf),0);
         if(ret < 0)
         {
             perror("send");
             close(sockfd);
             return -1;
         }
-        printf("发送第%d个\n",count);
+        printf("count = %d\n",count);
         count++;
+        /*
+        memset(buf,0,sizeof(buf));
+        recv(sockfd,buf,sizeof(buf)-1,0);
+        */
     }
     close(sockfd);
     return 0;
