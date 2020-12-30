@@ -98,6 +98,7 @@ class BSTree
     void InOrder()
     {
         _InOrder(root);
+        cout<<endl;
     }
     
     bool Earse(const T& date)
@@ -124,6 +125,48 @@ class BSTree
         //值为date元素不存在
         if(!cur)
             return false;
+        if(cur->left == NULL)
+        {
+            //只有右孩子or叶子节点
+            if(!parent)
+                root = cur->right;
+            else if(cur == parent->left)
+                parent->left = cur->right;
+            else 
+                parent->right = cur->right;
+        }
+        else if(cur->right == NULL)
+        {
+            //只有左孩子
+            if(!parent)
+                root = cur->left;
+            else if(cur == parent->left)
+                parent->left = cur->left;
+            else
+                parent->right = cur->left;
+        }
+        else
+        {
+            parent = cur;
+            Node* del = cur->left;
+            while(del->right)
+            {
+                parent = del;
+                del = del->right;
+            }
+            cur->date = del->date;
+            if(del == parent->right)
+            {
+                parent->right = del->left;
+            }
+            else
+            {
+               parent->left = del->left; 
+            }
+            cur = del;
+        }
+        delete cur;
+        return true;
 
     }
 
@@ -161,11 +204,17 @@ class BSTree
 
 void Test()
 {
-    int array[] = {1,2,6,9,0,7,5,4,3};
+    int array[] = {5,3,4,1,7,8,2,6,0,9};
     BSTree<int> t;
     for(auto e:array)
     {
         t.Insert(e);
     }
+    t.InOrder();
+    t.Earse(6);
+    t.InOrder();
+    t.Earse(8);
+    t.InOrder();
+    t.Earse(5);
     t.InOrder();
 }
