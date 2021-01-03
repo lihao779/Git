@@ -14,6 +14,15 @@ int main()
 
     map<string,string> m2 = {{"orange","橘子"},{"apple","苹果"},{"banana","香蕉"}};
 
+    cout<<m1["peach"]<<endl;
+    cout<<m1["pear"]<<endl;
+    m1["pear"] = "梨";
+    auto ret = m1.insert(make_pair("orange","橙子"));
+    if(!ret.second)
+    {
+        cout<<m1[(*(ret.first)).first]<<endl;
+        cout<<"插入失败"<<endl;
+    }
     for(auto& e:m1)
     {
         cout<<e.first<<"-"<<e.second<<endl;
@@ -43,7 +52,15 @@ int main()
     cout<<"m1-size:"<<m1.size()<<endl;
     cout<<"m2-size:"<<m2.size()<<endl;
     cout<<"-----------------------------------------------"<<endl;
-    cout<<m1["peach"]<<endl;
-    cout<<m1["pear"]<<endl;
+    m1.erase("orange");
+    cout<<"m1-size:"<<m1.size()<<endl;
+    auto pos = m1.find("orange");
+    if(pos != m1.end())
+    {
+        m1.erase(pos);
+    }
+    cout<<"m1-size:"<<m1.size()<<endl;
+    m1.erase(m1.begin(),m1.end());
+    cout<<"m1-size:"<<m1.size()<<endl;
     return 0;
 }
