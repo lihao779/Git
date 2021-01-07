@@ -204,40 +204,52 @@ class AVLTree
         void RotateRL(Node* parent)
         {
             Node* subR = parent->right;
-            Node* subRL = subR->left;
-            int bf = subRL->bf;
-            RotatoRight(parent->right);
-            RotatoLeft(parent);
-            
-            if(bf == 1)
+            Node* subLR = subL->right;
+            if(subLR)
             {
-                parent->bf = -1;
+                int bf = subLR->bf;
+                RotatoRight(parent->right);
+                RotatoLeft(parent);
+                
+                if(bf == 1)
+                {
+                    parent->bf = -1;
+                }
+                else if(bf == -1)
+                {
+                    subLR->bf = 1;
+                }
             }
-            else if(bf == -1)
+            else
             {
-                subR->bf = 1;
+                RotatoRight(parent->right);
+                RotatoLeft(parent);
             }
-            //else--->bf == 0 不需要处理
         }
 
         void RotateLR(Node* parent)
         {
             Node* subL = parent->left;
             Node* subLR = subL->right;
-            int bf = subLR->bf;
-            RotatoLeft(parent->left);
-            RotatoRight(parent);
-            if(bf == 1)
+            if(subLR)
             {
-                subL->bf = -1;
+                int bf = subLR->bf;
+                RotatoLeft(parent->left);
+                RotatoRight(parent);
+                if(bf == 1)
+                {
+                    subL->bf = -1;
+                }
+                else if(bf == -1)
+                {
+                    parent->bf = 1;
+                }
             }
-            else if(bf == -1)
+            else
             {
-                parent->bf = 1;
+                RotatoLeft(parent->left);
+                RotatoRight(parent);
             }
-
-            //else--->bf == 0 不需要处理
-            
         }
         private:
         Node* _root;
