@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+using namespace std;
 
 enum Color{RED,BLACK};
 
@@ -25,6 +27,7 @@ template<class T>
 class RBTree
 {
     typedef RBTreeNode<T> Node;
+    public:
     RBTree()
     {
         head = new Node();
@@ -130,8 +133,84 @@ class RBTree
         head->right = RightMost();
         return true;
     }
+    ~RBTree()
+    {
+        _Destroy(head->parent);
+    }
+    void InOrder()
+    {
+        _InOrder(head->parent);
+        cout<<endl;
+    }
     
+    bool IsValidRBTree()  //检测是否为红黑树
+    {
+        Node* root = GetRoot();
+        //空树
+        if(root == nullptr)
+            return true;
+
+        //非空--------按照红黑树的性质检测
+        //性质二检测
+        if(root->color != BLACK)
+        {
+            cout<<"违反红黑树的性质二!!!"<<endl;
+            return false;
+        }
+        //性质三和四检测
+        size_t blackCount = 0;
+        Node* cur = root;
+        while(cur)
+        {
+            if(cur->color == BLACK)
+                blackCount++;
+            cur = cur->left;
+        }
+        
+        //检测其他路径黑色节点个数是否和最左侧节点个数是否相同
+        size_t pathCount = 0;
+        return _IsValidRBTree(root,blackCount,pathCount);
+
+    }
+
+
     private:
+    bool _IsValidRBTree(Node* root,size_t blackCount,size_t pathCount)
+    {
+        if(root == nullptr)
+            return true;
+        if(root->color == BLACK)
+            pathCount++;
+        
+        Node* parent = root->parent;
+        if(parent != head)
+        {
+            if(parent->color == RED && root->color == RED)
+            {
+                cout<<"违反红黑树性质三!!!"<<endl;
+                return false;
+            }
+        }
+        if(root->left == nullptr && root->right == nullptr )
+        {
+            if(pathCount != blackCount)
+            {
+                cout<<"违反红黑树性质四!!!"<<endl;
+                return false;
+            }
+        }
+        return _IsValidRBTree(root->left,blackCount,pathCount) && _IsValidRBTree(root->right,blackCount,pathCount);
+
+    }
+    void _InOrder(Node* root)
+    {
+        if(root)
+        {
+            _InOrder(root->left);
+            cout<<root->date<<" ";
+            _InOrder(root->right);
+        }
+    }
     void RotateLeft(Node* parent)
     {
         Node* grandfater = parent->parent;
@@ -144,6 +223,22 @@ class RBTree
         subR->left = parent;
         parent->parent = subR;
         subR->parent = grandfater;
+        // 连接上面部分
+        if(grandfater == head)
+        {
+            head->parent = subR;
+        }
+        else
+        {
+            if(grandfater->left == parent)
+            {
+                grandfater->left = subR;
+            }
+            else
+            {
+                grandfater->right = subR;
+            }
+        }
 
     }
     void RotateRight(Node* parent)
@@ -158,6 +253,22 @@ class RBTree
         subL->right = parent;
         parent->parent = subL;
         subL->parent = grandfater;
+        // 连接上面部分
+        if(grandfater == head)
+        {
+            head->parent = subL;
+        }
+        else
+        {
+            if(grandfater->left == parent)
+            {
+                grandfater->left = subL;
+            }
+            else
+            {
+                grandfater->left = subL;
+            }
+        }
     }
 
     void swap(Node*& left,Node*& right)
@@ -190,6 +301,32 @@ class RBTree
         return head->parent;
     }
 
+    void _Destroy(Node*& root)
+    {
+        if(root)
+        {
+            _Destroy(root->left);
+            _Destroy(root->right);
+            delete root;
+            root = nullptr;
+        }
+    }
     private:
         Node* head;
 };
+
+
+void TestRBTree()
+{
+    int array[] = {5,3,4,1,7,8,2,4,0,9};
+    RBTree<int> t;
+    for(auto e:array)
+    {
+       t.Insert(e); 
+    }
+    t.InOrder();
+    if(t.IsValidRBTree())
+    {
+        cout<<"红黑树ok"<<endl;
+    }
+}
