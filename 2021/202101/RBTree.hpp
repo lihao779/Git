@@ -4,8 +4,6 @@ using namespace std;
 
 enum Color{RED,BLACK};
 
-
-
 template<class T>
 struct RBTreeNode
 {
@@ -24,129 +22,18 @@ struct RBTreeNode
     T date;
 };
 
-
-
-
-//构造迭代器
 template<class T>
-struct RBTreeIterator
-{
-    typedef RBTreeNode<T> Node;
-    typedef RBTreeIterator<T> Self;
-    RBTreeIterator(Node* node = nullptr)
-        :pNode(node)
-    {}
-    // 具有指针类似的方法
-    T& operator*()
-    {
-        return pNode->date;
-    }
-    T* operator->()
-    {
-        return &(operator*());
-    }
-
-    Self& operator++()
-    {
-        Increament();
-        return *this;
-    }
-    Self operator++(int)
-    {
-        Self temp(*this);
-        Increament();
-        return temp;
-    }
-    Self& operator--()
-    {
-        Decreament();
-        return *this;
-    }
-    Self operator--(int)
-    {
-        Self temp(*this);
-        Decreament();
-        return temp;
-    }
-    bool operator!=(const Self& s)
-    {
-        return pNode != s.pNode;
-    }
-    bool operator==(const Self& s)
-    {
-        return pNode == s.pNode;
-    }
-    private:
-    void Increament()
-    {
-        //分两种情况
-        //1.有右子树
-        //2.没有右子树
-        if(pNode->right)
-        {
-            pNode = pNode->right;
-            while(pNode->left)
-                pNode = pNode->left;
-        }
-        else
-        {
-            Node* parent = pNode->parent;
-            while(parent->right == pNode)
-            {
-                pNode = parent;
-                parent = pNode->parent;
-            }
-            //特殊：如果根节点没有右子树
-            if(pNode->right != parent)
-            pNode = parent;
-        }
-    }
-    void Decreament()
-    {
-        //分三种情况
-        //1.pNode已经在end()的位置
-        //2.有左子树
-        //3.没有左子树
-        if(pNode->parent->parent == pNode && pNode->color == RED)
-            pNode = pNode->right;
-        else if(pNode->left)
-        {
-            pNode = pNode->left;
-            while(pNode->right)
-                pNode = pNode->right;
-        }
-        else
-        {
-            Node* parent = pNode->parent;
-            while(parent->left == pNode)
-            {
-                pNode = parent;
-                parent = pNode->parent;
-            }
-            pNode = parent;
-        }
-    }
-    Node* pNode;
-};
-
-
-
-template<class T,class KOFV>
 class RBTree
 {
     typedef RBTreeNode<T> Node;
-    public:
-    typedef RBTreeIterator<T> iterator;
     public:
     RBTree()
     {
         head = new Node();
         head->left = head;
         head->right = head;
-        _size = 0;
     }
-
-    pair<iterator,bool> Insert(const T& date)
+    bool Insert(const T& date)
     {
         Node*& root = GetRoot();
         if(root == nullptr)
@@ -156,25 +43,22 @@ class RBTree
             head->right = root;
             head->parent = root;
             root->parent = head;
-            _size++;
-            return make_pair(iterator(root),true);
+            return true;
         }
         Node* cur = root;
         Node* parent = head;
-        KOFV kofv;
         while(cur)
         {
             parent = cur;
-            if(kofv(date) < kofv(cur->date))
+            if(date < cur->date)
                 cur = cur->left;
-            else if(kofv(date) > kofv(cur->date))
+            else if(date > cur->date)
                 cur = cur->right;
             else
-                return make_pair(iterator(cur),false);
+                return false;
         }
         cur = new Node(date);
-        Node* pNewNode = cur;
-        if(kofv(date) < kofv(parent->date))
+        if(date < parent->date)
             parent->left = cur;
         else
             parent->right = cur;
@@ -246,72 +130,12 @@ class RBTree
         root->color = BLACK;
         head->left = LeftMost();
         head->right = RightMost();
-        _size++;
-        return make_pair(pNewNode,true);
-    }
-    
-    void swap(RBTree<T,KOFV>& t)
-    {
-        std::swap(head,t.head);
-        std::swap(_size,t._size);
-    }
-    
-    void clear()
-    {
-        _Destroy(head->parent);
-        _size= 0;
-        head->left = head;
-        head->right = head;
-    }
-
-    iterator find(const T& date)
-    {
-        KOFV kofv;
-        Node* cur = GetRoot();
-        while(cur)
-        {
-            if(kofv(cur->date) == kofv(date))
-                return iterator(cur);
-            else if(kofv(date) < kofv(cur->date))
-                cur = cur->left;
-            else
-                cur = cur->right;
-        }
-        return end();
+        return true;
     }
     ~RBTree()
     {
         _Destroy(head->parent);
-        delete head;
-        head = nullptr;
     }
-
-    ///////////////////////////
-    //iterator
-    iterator begin()
-    {
-        return iterator(head->left);
-    }
-    iterator end()
-    {
-        return iterator(head);
-    }
-
-
-    ///////////////////////////////
-    // capacity
-    bool empty()const 
-    {
-        return head->parent == nullptr;
-    }
-
-    size_t size()const
-    {
-        return _size;
-    }
-    ////////////////////////////
-    //access
-
     void InOrder()
     {
         _InOrder(head->parent);
@@ -534,29 +358,17 @@ class RBTree
             _Destroy(root->right);
             delete root;
             root = nullptr;
-            _size = 0;
         }
     }
     private:
         Node* head;
-        size_t _size;
 };
 
 
-
-
-class KOFV
-{
-    public:
-        int operator()(int v)
-        {
-            return v;
-        }
-};
 void TestRBTree()
 {
     int array[] = {5,3,4,1,7,8,2,4,0,9};
-    RBTree<int,KOFV> t;
+    RBTree<int> t;
     for(auto e:array)
     {
        t.Insert(e); 
@@ -566,16 +378,4 @@ void TestRBTree()
     {
         cout<<"红黑树ok"<<endl;
     }
-    for(auto e:t)
-    {
-        cout<<e<<" ";
-    }
-    cout<<endl;
-    RBTree<int,KOFV>::iterator it = t.begin();
-    while(it != t.end())
-    {
-        cout<<*it<<" ";
-        it++;
-    }
-    cout<<endl;
 }
