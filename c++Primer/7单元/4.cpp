@@ -1,4 +1,6 @@
+#include <iostream>
 #include <string>
+using namespace std;
 
 struct Sales_date
 {
@@ -7,6 +9,8 @@ struct Sales_date
         return ISBN;
     }
     Sales_date& combine(const Sales_date&);
+    double arg_price()const;
+
     std::string ISBN;
     unsigned units_sold;
     double revenue;
@@ -17,6 +21,45 @@ Sales_date& Sales_date::combine(const Sales_date& date)
     revenue += date.revenue;
     return *this;
 }
+double Sales_date::arg_price()const
+{
+    return revenue / units_sold;
+}
+
+///////////////////////////
+//类外
+istream& read(istream& is,Sales_date& date)
+{
+    double price;
+    is >> date.ISBN >> date.units_sold >> price;
+    date.revenue = date.units_sold*price;
+    return is;
+}
+ostream& print(ostream& os,const Sales_date& date)
+{
+    os << date.isbn() <<" "<< date.units_sold << " "<< date.revenue <<" "
+        <<date.arg_price();
+    return os;
+}
+Sales_date add(const Sales_date& th1,const Sales_date& th2)
+{
+    Sales_date sum = th1;
+    sum.combine(th2);
+    return sum;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 struct Person
 {
@@ -31,3 +74,13 @@ struct Person
     std::string _name;
     std::string _addr;
 };
+ostream& print(ostream& os,const Person& p)
+{
+    os << p.Name() << " " << p.Addr();
+    return os;
+}
+istream& read(istream& is,Person& p)
+{
+    is >> p._name >>p._addr;
+    return is;
+}
