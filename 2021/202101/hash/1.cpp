@@ -1,6 +1,8 @@
 #include "hash.hpp"
 #include <iostream>
 #include <cstdio>
+#include "UnorderMap.hpp"
+// #include "UnorderSet.hpp"
 using namespace std;
 
 
@@ -18,8 +20,9 @@ void Test1()
 
 int main()
 {
-    TestHash1();
+    // TestHash1();
     // TestHash2();
-
+    TestUnorderMap();
+    Testunordered_map();
     return 0;
 }

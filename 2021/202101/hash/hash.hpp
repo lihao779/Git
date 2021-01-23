@@ -62,7 +62,7 @@ struct HashNode
 };
 ///////////////////////////////
 //iterator
-template<class T,class KOFV,class DToInt = DToIntDef<T>>
+template<class T,class KOFV,class DToInt = DToIntStr>
 class  HashBucket;
 
 template<class T,class KOFV,class DToInt>
