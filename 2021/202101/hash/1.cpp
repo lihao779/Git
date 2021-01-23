@@ -19,7 +19,7 @@ void Test1()
 int main()
 {
     TestHash1();
-    TestHash2();
+    // TestHash2();
 
     return 0;
 }
