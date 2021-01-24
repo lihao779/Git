@@ -11,5 +11,6 @@ int main()
     string strbinary("00111100");
     bitset<8> bst1(strbinary);
     cout<<bst1.to_ulong()<<endl;
+
     return 0;
 }
