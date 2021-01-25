@@ -11,6 +11,7 @@
 
 #include "ConnectInfo.hpp"
 #include "tools.hpp"
+#include "UserManager.hpp"
 
 #define TCP_PORT 17878
 
@@ -20,14 +21,18 @@ class TcpConnect
     public:
         TcpConnect()
             :new_sock_(-1)
+             ,server_(nullptr)
         {}
         ~TcpConnect()
         {}
 
         void SetScokfd(int fd);
         int GetScokfd();
+        void SetServer(void* server);
+        void* GetServer();
     private:
         int new_sock_;
+        void* server_;//保存ChatServer的this指针
 };
 void TcpConnect::SetScokfd(int fd)
 {
@@ -36,6 +41,14 @@ void TcpConnect::SetScokfd(int fd)
 int TcpConnect::GetScokfd()
 {
     return new_sock_;
+}
+void TcpConnect::SetServer(void* server)
+{
+    server_ = server;
+}
+void* TcpConnect::GetServer()
+{
+    return server_;
 }
 
 
@@ -46,9 +59,13 @@ class ChatServer
         ChatServer()
         {
             tcp_sock_ = -1;
+            user_manager_ = nullptr;
         }
         ~ChatServer()
-        {}
+        {
+            delete user_manager_;
+        }
+
 
         
         int InitSvr(uint16_t tcp_port = TCP_PORT); // 初始化变量接口
@@ -62,6 +79,7 @@ class ChatServer
     private:
         int tcp_sock_;
         int udp_sock_;
+        UserManage* user_manager_; 
 };
 
 
@@ -90,7 +108,13 @@ int ChatServer::InitSvr(uint16_t tcp_port)
     {
         return -3;
     }
-    
+    //创建用户管理模块的实例化指针
+    user_manager_ = new UserManage(); 
+    if(!user_manager_)
+    {
+        LOG(ERROR,"创建用户管理模块");
+        return -1;
+    }
     // 暂时没考虑udp，登陆注册模块，消息池模块
     
     return 0;
@@ -118,6 +142,7 @@ int ChatServer::Start()
         }
         TcpConnect* tc = new TcpConnect();
         tc->SetScokfd(new_sock);
+        tc->SetServer((void*)this);
 
         pthread_t tid;
         int ret = pthread_create(&tid,NULL,LoginRegisterStart,(void*)tc);
@@ -165,7 +190,7 @@ void* ChatServer::LoginRegisterStart(void* arg)
             break;
         }
     }
-    //注册成功||登录成功
+    //返回用户:注册成功||登录成功
     //TODO
     close(tc->GetScokfd());
     delete tc;
@@ -173,6 +198,7 @@ void* ChatServer::LoginRegisterStart(void* arg)
 }
 int ChatServer::DealRegister(TcpConnect* tc)
 {
+    ChatServer* cs = (ChatServer*)tc->GetServer();
     struct RegisterInfo ri;
     ssize_t recv_size = recv(tc->GetScokfd(),&ri,sizeof(ri),0);
     if(recv_size < 0)
@@ -185,7 +211,9 @@ int ChatServer::DealRegister(TcpConnect* tc)
         close(tc->GetScokfd());
         return -2;
     }
-    //TODO
+    //插入用户管理模块
+    cs->user_manager_->DealRegister(ri.nick_name_,ri.school_,ri.passwd_);
+    
 
     return 0;
 }
