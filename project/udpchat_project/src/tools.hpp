@@ -46,7 +46,7 @@ std::ostream& Log(LogLevel log,const char* file,int line,const std::string& msg)
 {
     std::string timeStamp;
     TimeStamp::GetTimeStamp(timeStamp);
-    std::cout << "[" << timeStamp << " " << LevelInfo[log] << " " << file << ":" << line << "]  " << msg << std::endl;
+    std::cout << "[" << timeStamp << " " << LevelInfo[log] << " " << file << ":" << line << "]  " << msg;
     return std::cout;
 }
 

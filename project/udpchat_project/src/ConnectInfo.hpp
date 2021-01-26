@@ -4,6 +4,7 @@
 #include <string.h>
 #include <iostream>
 
+#define TCP_PORT 17878
 //////注册请求数据格式////////
 struct RegisterInfo
 {

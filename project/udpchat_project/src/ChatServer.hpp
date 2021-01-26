@@ -13,8 +13,7 @@
 #include "tools.hpp"
 #include "UserManager.hpp"
 
-#define TCP_PORT 17878
-
+#define MAX_ROUND_COUNT 10
 
 class TcpConnect
 {
@@ -74,8 +73,8 @@ class ChatServer
 
     private:
         static void* LoginRegisterStart(void* arg); //登陆注册线程入口
-        static int DealRegister(TcpConnect* tc); //处理注册
-        static int DealLogin(TcpConnect* tc); //处理登录
+        int DealRegister(TcpConnect* tc,uint32_t* user_id); //处理注册
+        int DealLogin(TcpConnect* tc,uint32_t* user_id); //处理登录
     private:
         int tcp_sock_;
         int udp_sock_;
@@ -112,7 +111,7 @@ int ChatServer::InitSvr(uint16_t tcp_port)
     user_manager_ = new UserManage(); 
     if(!user_manager_)
     {
-        LOG(ERROR,"创建用户管理模块");
+        LOG(ERROR,"创建用户管理模块") << std::endl;
         return -1;
     }
     // 暂时没考虑udp，登陆注册模块，消息池模块
@@ -146,7 +145,12 @@ int ChatServer::Start()
 
         pthread_t tid;
         int ret = pthread_create(&tid,NULL,LoginRegisterStart,(void*)tc);
-        
+        if(ret < 0)
+        {
+            close(tc->GetScokfd());
+            delete tc;
+            tc = nullptr;
+        }
     }
 }
 void* ChatServer::LoginRegisterStart(void* arg)
@@ -154,6 +158,7 @@ void* ChatServer::LoginRegisterStart(void* arg)
     pthread_detach(pthread_self());
 
     TcpConnect* tc = (TcpConnect*)arg;
+    ChatServer* cs = (ChatServer*)tc->GetServer();
 
     char ques_type = -1;
     ssize_t recv_size = recv(tc->GetScokfd(),&ques_type,1,0);
@@ -161,44 +166,62 @@ void* ChatServer::LoginRegisterStart(void* arg)
     {
         close(tc->GetScokfd());
         delete tc;
-        return NULL;
+        tc = nullptr;
+        return nullptr;
     }
     else if(recv_size == 0)
     {
         close(tc->GetScokfd());
         delete tc;
-        return NULL;
+        tc = nullptr;
+        return nullptr;
     }
+    int resp_status = -1;
+    uint32_t user_id = -1;
     switch(ques_type)
     {
         case REGISTER_RESQ:
         {
-           if(DealRegister(tc) < 0)
-           {
-               delete tc;
-               return NULL;
-           }
+            resp_status = cs->DealRegister(tc,&user_id);
             break;
         }
         case LOGIN_RESQ:
         {  
-            if(DealLogin(tc) < 0)
-            {
-                delete tc;
-                return NULL;
-            }
+            resp_status = cs->DealLogin(tc,&user_id);
             break;
         }
     }
     //返回用户:注册成功||登录成功
-    //TODO
+    //struct RelpyInfo
+    
+    struct ReplyInfo ri;
+    ri.resp_status_ = resp_status;
+    ri.id_ = user_id; 
+    
+    LOG(INFO,"服务端注册或者登录完毕")<<"status:"<<resp_status<<std::endl;
+    std::cout<<"注册id:"<<user_id<<std::endl;
+    
+    int max_round_count = MAX_ROUND_COUNT;
+    while(max_round_count--)
+    {
+        ssize_t send_size = send(tc->GetScokfd(),&ri,sizeof(ri),0);
+        if(send_size < 0)
+        {
+            LOG(WARNING,"服务端回复注册或者登陆失败")<<std::endl;
+        }
+        else
+        {
+            LOG(INFO,"服务端回复注册或者登陆成功")<<std::endl;
+            break;
+        }
+    }
     close(tc->GetScokfd());
     delete tc;
-    return NULL;
+    tc = nullptr;
+    return nullptr;
 }
-int ChatServer::DealRegister(TcpConnect* tc)
+int ChatServer::DealRegister(TcpConnect* tc,uint32_t* user_id)
 {
-    ChatServer* cs = (ChatServer*)tc->GetServer();
     struct RegisterInfo ri;
     ssize_t recv_size = recv(tc->GetScokfd(),&ri,sizeof(ri),0);
     if(recv_size < 0)
@@ -212,12 +235,14 @@ int ChatServer::DealRegister(TcpConnect* tc)
         return -2;
     }
     //插入用户管理模块
-    cs->user_manager_->DealRegister(ri.nick_name_,ri.school_,ri.passwd_);
-    
-
-    return 0;
+    int ret = user_manager_->DealRegister(ri.nick_name_,ri.school_,ri.passwd_,user_id);
+    if(ret < 0)
+    {
+        return REGISTER_FAILED;
+    }
+    return REGISTER_SUCCESS;
 }
-int ChatServer::DealLogin(TcpConnect* tc)
+int ChatServer::DealLogin(TcpConnect* tc,uint32_t* user_id)
 {
     struct LoginInfo li;
     ssize_t recv_size = recv(tc->GetScokfd(),&li,sizeof(li),0);
@@ -231,7 +256,13 @@ int ChatServer::DealLogin(TcpConnect* tc)
         close(tc->GetScokfd());
         return -2;
     }
-    //TODO
-    
-    return 0;
+    *user_id = li.id_;
+    //接收成功
+    int ret = user_manager_->DealLogin(li.id_,li.passwd_);
+    if(ret < 0)
+    {
+        return LOGIN_FAILED;
+    }
+    return LOGIN_SUCCESS;
 }
+

@@ -25,6 +25,7 @@ class UserInfo
         {}
         ~UserInfo()
         {}
+        const std::string GetPasswd();
 
     private:
         std::string nick_name_;
@@ -33,6 +34,10 @@ class UserInfo
 
         uint32_t userid_;//用户id
 };
+const std::string UserInfo::GetPasswd()
+{
+    return passwd_;
+}
 
 
 class UserManage
@@ -49,14 +54,15 @@ class UserManage
             pthread_mutex_destroy(&map_lock_);
         }
 
-        int DealRegister(const std::string& nick_name,const std::string& school,const std::string passwd);
+        int DealRegister(const std::string& nick_name,const std::string& school,const std::string passwd,uint32_t* user_id);
+        int DealLogin(uint32_t id,const std::string& passwd);
     private:
         std::unordered_map<uint32_t,UserInfo> user_map_;//key-value(id-usermessage)
         pthread_mutex_t map_lock_;// 保护user_map的线程安全
         uint32_t prepare_id_; //预分配id
 };
 
-int UserManage::DealRegister(const std::string& nick_name,const std::string& school,const std::string passwd)
+int UserManage::DealRegister(const std::string& nick_name,const std::string& school,const std::string passwd,uint32_t* user_id)
 {
     if(nick_name.size() == 0 || school.size() == 0 || passwd.size() == 0)
         return -1;
@@ -64,8 +70,30 @@ int UserManage::DealRegister(const std::string& nick_name,const std::string& sch
 
     UserInfo ui(nick_name,school,passwd,prepare_id_);
     user_map_.insert(std::make_pair(prepare_id_,ui));
+    *user_id = prepare_id_;
     prepare_id_++;
 
     pthread_mutex_unlock(&map_lock_);
-
+    return 0;
+}
+int UserManage::DealLogin(uint32_t id,const std::string& passwd)
+{
+    if(passwd.size() == 0)
+        return -1;
+    std::unordered_map<uint32_t,UserInfo>::iterator iter;
+    pthread_mutex_lock(&map_lock_);
+    iter = user_map_.find(id);
+    if(iter == user_map_.end())
+    {
+        pthread_mutex_unlock(&map_lock_);
+        return -2;
+    }
+    const std::string reg_passwd = iter->second.GetPasswd();
+    if(reg_passwd != passwd)
+    {
+        pthread_mutex_unlock(&map_lock_);
+        return -3;
+    }
+    pthread_mutex_unlock(&map_lock_);
+    return 0;
 }
