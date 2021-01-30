@@ -22,10 +22,12 @@ class UserInfo
              ,school_(school)
              ,passwd_(passwd)
              ,userid_(userid)
+             ,user_status(REGISTER_FAILED)
         {}
         ~UserInfo()
         {}
         const std::string GetPasswd();
+        void SetUserStatus(int status);
 
     private:
         std::string nick_name_;
@@ -33,10 +35,15 @@ class UserInfo
         std::string passwd_;
 
         uint32_t userid_;//用户id
+        int user_status;
 };
 const std::string UserInfo::GetPasswd()
 {
     return passwd_;
+}
+void UserInfo::SetUserStatus(int status)
+{
+    user_status = status;
 }
 
 
@@ -69,6 +76,7 @@ int UserManage::DealRegister(const std::string& nick_name,const std::string& sch
     pthread_mutex_lock(&map_lock_);
 
     UserInfo ui(nick_name,school,passwd,prepare_id_);
+    ui.SetUserStatus(REGISTER_SUCCESS);
     user_map_.insert(std::make_pair(prepare_id_,ui));
     *user_id = prepare_id_;
     prepare_id_++;
@@ -91,9 +99,11 @@ int UserManage::DealLogin(uint32_t id,const std::string& passwd)
     const std::string reg_passwd = iter->second.GetPasswd();
     if(reg_passwd != passwd)
     {
+    iter->second.SetUserStatus(LOGIN_FAILED);
         pthread_mutex_unlock(&map_lock_);
         return -3;
     }
+    iter->second.SetUserStatus(LOGIN_SUCCESS);
     pthread_mutex_unlock(&map_lock_);
     return 0;
 }

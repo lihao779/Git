@@ -12,8 +12,11 @@
 #include "ConnectInfo.hpp"
 #include "tools.hpp"
 #include "UserManager.hpp"
+#include "MessagePool.hpp"
+
 
 #define MAX_ROUND_COUNT 10
+#define PTHREAD_COUNT 1
 
 class TcpConnect
 {
@@ -58,16 +61,29 @@ class ChatServer
         ChatServer()
         {
             tcp_sock_ = -1;
+            udp_sock_ = -1;
             user_manager_ = nullptr;
+            msg_pool_ = nullptr;
+            memset(con_tid_,'\0',sizeof(pthread_t)*PTHREAD_COUNT);
+            memset(pro_tid_,'\0',sizeof(pthread_t)*PTHREAD_COUNT);
         }
         ~ChatServer()
         {
-            delete user_manager_;
+            if(user_manager_)
+            {
+                delete user_manager_;
+                user_manager_ = nullptr;
+            }
+            if(msg_pool_)
+            {
+                delete msg_pool_;
+                msg_pool_ = nullptr;
+            }
         }
 
 
         
-        int InitSvr(uint16_t tcp_port = TCP_PORT); // 初始化变量接口
+        int InitSvr(uint16_t tcp_port = TCP_PORT,uint16_t udp_port = UDP_PORT); // 初始化变量接口
         int Start(); // 启动线程 --udp(消息池中的生产&消费线程) --tcp(登陆&注册线程)
 
 
@@ -75,17 +91,25 @@ class ChatServer
         static void* LoginRegisterStart(void* arg); //登陆注册线程入口
         int DealRegister(TcpConnect* tc,uint32_t* user_id); //处理注册
         int DealLogin(TcpConnect* tc,uint32_t* user_id); //处理登录
+        static void* ProductStart(void* arg); //消费线程
+        static void* ConsumeStart(void* arg); //生产线程
+        int RecvMsg();
+        int SendMsg();
     private:
         int tcp_sock_;
         int udp_sock_;
         UserManage* user_manager_; 
+        MsgPool* msg_pool_; 
+        //udp线程的标识符数组
+        pthread_t con_tid_[PTHREAD_COUNT];
+        pthread_t pro_tid_[PTHREAD_COUNT];
 };
 
 
 
 
 
-int ChatServer::InitSvr(uint16_t tcp_port)
+int ChatServer::InitSvr(uint16_t tcp_port,uint16_t udp_port)
 {
     //创建tcp_sock_
     tcp_sock_ = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
@@ -93,11 +117,11 @@ int ChatServer::InitSvr(uint16_t tcp_port)
     {
         return -1;
     }
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(tcp_port);
-    addr.sin_addr.s_addr = inet_addr("0.0.0.0");
-    int ret = bind(tcp_sock_,(struct sockaddr*)&addr,sizeof(addr));
+    struct sockaddr_in tcp_addr;
+    tcp_addr.sin_family = AF_INET;
+    tcp_addr.sin_port = htons(tcp_port);
+    tcp_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+    int ret = bind(tcp_sock_,(struct sockaddr*)&tcp_addr,sizeof(tcp_addr));
     if(ret < 0)
     {
         return -2;
@@ -111,11 +135,32 @@ int ChatServer::InitSvr(uint16_t tcp_port)
     user_manager_ = new UserManage(); 
     if(!user_manager_)
     {
-        LOG(ERROR,"创建用户管理模块") << std::endl;
+        LOG(ERROR,"创建用户管理模块失败") << std::endl;
         return -1;
     }
-    // 暂时没考虑udp，登陆注册模块，消息池模块
-    
+    msg_pool_ = new MsgPool();
+    if(!msg_pool_)
+    {
+        LOG(ERROR,"创建消息池失败") << std::endl;
+        return -1;
+    }
+    // 创建udp_sock
+    udp_sock_ = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+    if(udp_sock_ < 0)
+    {
+        LOG(ERROR,"udp_sock创建失败") << std::endl;
+        return -1;
+    }
+    struct sockaddr_in udp_addr;
+    udp_addr.sin_family = AF_INET;
+    udp_addr.sin_port = htons(udp_port);
+    udp_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+    ret = bind(udp_sock_,(struct sockaddr*)&udp_addr,sizeof(udp_addr));
+    if(ret < 0)
+    {
+        LOG(ERROR,"udp_sock绑定失败") << std::endl;
+        return -2;
+    }
     return 0;
 }
 
@@ -129,6 +174,24 @@ int ChatServer::InitSvr(uint16_t tcp_port)
  */
 int ChatServer::Start()
 {
+    //创建udp线程
+    for(int i = 0;i < PTHREAD_COUNT;i++)
+    {
+        int ret = pthread_create(&con_tid_[i],NULL,ConsumeStart,this);
+        if(ret < 0)
+        {
+            LOG(ERROR,"消费线程创建失败") << std::endl;
+            return -1;
+        }
+        ret = pthread_create(&pro_tid_[i],NULL,ProductStart,this);
+        if(ret < 0)
+        {
+            LOG(ERROR,"生产线程创建失败") << std::endl;
+            return -1;
+        }
+    }
+
+
     struct sockaddr_in peer_addr;
     socklen_t peer_addrlen = sizeof(peer_addr);
     while(1)
@@ -266,3 +329,37 @@ int ChatServer::DealLogin(TcpConnect* tc,uint32_t* user_id)
     return LOGIN_SUCCESS;
 }
 
+void* ChatServer::ProductStart(void* arg)
+{
+    pthread_detach(pthread_self());    
+    ChatServer* cs = (ChatServer*)arg;
+    while(1)
+    {
+        cs->RecvMsg();
+    }
+}
+void* ChatServer::ConsumeStart(void* arg)
+{
+    pthread_detach(pthread_self());    
+    ChatServer* cs = (ChatServer*)arg;
+    while(1)
+    {
+        cs->SendMsg();
+    }
+}
+int ChatServer::RecvMsg()
+{
+    //1.接收数据
+    //2.放入消息池
+    char buf[UDP_MAX_DATE] = {0};
+    int recv_size = recvfrom(udp_sock_,buf,sizeof(buf)-1,0,NULL,NULL);
+    if(recv_size < 0)
+    {
+        return -1;
+    }
+}
+int ChatServer::SendMsg()
+{
+    //1.从消息池中读取数据
+    //2.发送给在线用户
+}

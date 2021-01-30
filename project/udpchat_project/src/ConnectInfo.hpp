@@ -5,6 +5,10 @@
 #include <iostream>
 
 #define TCP_PORT 17878
+#define UDP_PORT 17878
+#define CAPACITY 10
+#define UDP_MAX_DATE 10240
+
 //////注册请求数据格式////////
 struct RegisterInfo
 {
