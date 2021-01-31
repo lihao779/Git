@@ -1,7 +1,12 @@
 #pragma once
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <pthread.h>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 
 #include "ConnectInfo.hpp"
@@ -22,12 +27,21 @@ class UserInfo
              ,school_(school)
              ,passwd_(passwd)
              ,userid_(userid)
-             ,user_status(REGISTER_FAILED)
-        {}
+             ,user_status_(REGISTER_FAILED)
+             ,addrlen_(sizeof(addr_))
+        {
+            memset(&addr_,'\0',sizeof(addr_));
+        }
         ~UserInfo()
         {}
         const std::string GetPasswd();
         void SetUserStatus(int status);
+        int GetUserStatus();
+        void SetUserAddr(struct sockaddr_in addr);
+        void SetUserAddrlen(const socklen_t len);
+        struct sockaddr_in GetUserAddr();
+        socklen_t GetUserAddrlen();
+        
 
     private:
         std::string nick_name_;
@@ -35,7 +49,9 @@ class UserInfo
         std::string passwd_;
 
         uint32_t userid_;//用户id
-        int user_status;
+        int user_status_;
+        struct sockaddr_in addr_;
+        socklen_t addrlen_;
 };
 const std::string UserInfo::GetPasswd()
 {
@@ -43,7 +59,29 @@ const std::string UserInfo::GetPasswd()
 }
 void UserInfo::SetUserStatus(int status)
 {
-    user_status = status;
+    user_status_ = status;
+}
+int UserInfo::GetUserStatus()
+{
+    return user_status_;
+}
+void UserInfo::SetUserAddr(struct sockaddr_in addr)
+{
+    
+    memcpy(&addr_,(void*)&addr,sizeof(addr));
+    
+}
+void UserInfo::SetUserAddrlen(const socklen_t len)
+{
+    addrlen_ = len;
+}
+struct sockaddr_in UserInfo::GetUserAddr()
+{
+    return addr_;
+}
+socklen_t UserInfo::GetUserAddrlen()
+{
+    return addrlen_;
 }
 
 
@@ -54,6 +92,7 @@ class UserManage
         {
             pthread_mutex_init(&map_lock_,NULL);
             user_map_.clear();
+            online_user_.clear();
             prepare_id_ = 0;
         }
         ~UserManage()
@@ -63,10 +102,13 @@ class UserManage
 
         int DealRegister(const std::string& nick_name,const std::string& school,const std::string passwd,uint32_t* user_id);
         int DealLogin(uint32_t id,const std::string& passwd);
+        int IsLog(uint32_t user_id,struct sockaddr_in addr,socklen_t addrlen);
+        void GetOnlineUer(std::vector<UserInfo>* vec);
     private:
         std::unordered_map<uint32_t,UserInfo> user_map_;//key-value(id-usermessage)
         pthread_mutex_t map_lock_;// 保护user_map的线程安全
         uint32_t prepare_id_; //预分配id
+        std::vector<UserInfo> online_user_;//保存在线用户
 };
 
 int UserManage::DealRegister(const std::string& nick_name,const std::string& school,const std::string passwd,uint32_t* user_id)
@@ -106,4 +148,34 @@ int UserManage::DealLogin(uint32_t id,const std::string& passwd)
     iter->second.SetUserStatus(LOGIN_SUCCESS);
     pthread_mutex_unlock(&map_lock_);
     return 0;
+}
+int UserManage::IsLog(uint32_t user_id,struct sockaddr_in addr,socklen_t addrlen)
+{
+    std::unordered_map<uint32_t,UserInfo>::iterator iter;
+    pthread_mutex_lock(&map_lock_);
+    iter = user_map_.find(user_id);
+
+    if(iter == user_map_.end())
+    {
+        pthread_mutex_unlock(&map_lock_);
+        return -1;
+    }
+    if(iter->second.GetUserStatus() < LOGIN_SUCCESS)
+    {
+        pthread_mutex_unlock(&map_lock_);
+        return -1;
+    }
+    else if(iter->second.GetUserStatus() == LOGIN_SUCCESS)
+    {
+        iter->second.SetUserStatus(ONLINE);
+        iter->second.SetUserAddr(addr);
+        iter->second.SetUserAddrlen(addrlen);
+        online_user_.push_back(iter->second);
+    }
+    pthread_mutex_unlock(&map_lock_);
+    return 0;
+}
+void UserManage::GetOnlineUer(std::vector<UserInfo>* vec)
+{
+    *vec = online_user_;
 }

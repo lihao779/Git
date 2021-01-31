@@ -66,6 +66,15 @@ int main(int argc,char* argv[])
            else
            {
                LOG(INFO,"login success ,please chatting") <<std::endl;
+               uc.CreateUdpSock();
+               while(1)
+               {
+                    std::string msg;
+                    std::cout << "please enter your msg:";
+                    std::cin >> msg;
+                    uc.SendUdpMsg(msg,ip);     
+                    uc.RecvUdpMsg();
+               }
            }
            uc.CloseFd();
         }

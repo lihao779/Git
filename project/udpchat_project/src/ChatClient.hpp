@@ -30,20 +30,26 @@ class UdpClient
     public:
     UdpClient()
         :tcp_sock_(-1)
+         ,udp_sock_(-1)
     {}
     ~UdpClient()
     {}
 
-    int CreateSock();
-    int ConnecttoSvr(const std::string& ip);
+    int CreateUdpSock();
     int RegistertoSvr(const std::string& ip);
     int LogtoSvr(const std::string& ip);
+    int SendUdpMsg(const std::string& msg,const std::string& ip);
+    int RecvUdpMsg();
     void CloseFd();
     private:
+    int CreateTCPSock();
+    int ConnecttoSvr(const std::string& ip);
+    private:
         int tcp_sock_;
+        int udp_sock_;
         MySelf me_;
 };
-int UdpClient::CreateSock()
+int UdpClient::CreateTCPSock()
 {
     tcp_sock_ = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
     if(tcp_sock_ < 0)
@@ -52,6 +58,16 @@ int UdpClient::CreateSock()
         return -1;
     }
     //客户端不推荐绑定
+    return 0;
+}
+int UdpClient::CreateUdpSock()
+{
+    udp_sock_ = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+    if(udp_sock_ < 0)
+    {
+        LOG(ERROR,"创建客户端udp_sock失败")<<std::endl;
+        return -1;
+    }
     return 0;
 }
 int UdpClient::ConnecttoSvr(const std::string& ip)
@@ -70,7 +86,7 @@ int UdpClient::ConnecttoSvr(const std::string& ip)
 }
 int UdpClient::RegistertoSvr(const std::string& ip)
 {
-    int ret = CreateSock();
+    int ret = CreateTCPSock();
     if(ret < 0)
     {
         return -1;
@@ -142,7 +158,7 @@ int UdpClient::RegistertoSvr(const std::string& ip)
 }
 int UdpClient::LogtoSvr(const std::string& ip)
 {
-    int ret = CreateSock();
+    int ret = CreateTCPSock();
     if(ret < 0)
         return -1;
     ret = ConnecttoSvr(ip);
@@ -194,4 +210,55 @@ void UdpClient::CloseFd()
         close(tcp_sock_);
         tcp_sock_ = -1;
     }
+}
+int UdpClient::SendUdpMsg(const std::string& msg,const std::string& ip)
+{
+    UdpMsg um;
+    um.Get_nick_name() = me_.nick_name_;
+    um.Get_school() = me_.school_;
+    um.Get_msg() = msg;
+    um.Get_id() = me_.user_id_;
+
+    std::string str_msg;
+    um.serialize(&str_msg);
+
+    struct sockaddr_in dest_addr;
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = htons(UDP_PORT);
+    dest_addr.sin_addr.s_addr = inet_addr(ip.c_str());
+    socklen_t dest_addrlen = sizeof(dest_addr);
+
+    int udpsend_max = UDPSEND_MAX;
+    while(udpsend_max--)
+    {
+        int ret = sendto(udp_sock_,str_msg.c_str(),str_msg.size(),0,(struct sockaddr*)&dest_addr,dest_addrlen);
+        if(ret < 0)
+        {
+            LOG(ERROR,"客户端发送消息失败") << std::endl;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return -1;
+}
+int UdpClient::RecvUdpMsg()
+{
+    char buf[UDP_MAX_DATE] = {0};
+    int ret = recvfrom(udp_sock_,buf,sizeof(buf) - 1,0,NULL,NULL);
+    if(ret < 0)
+    {
+        LOG(ERROR,"客户端接收消息失败") << std::endl;
+        return -1;
+    }
+    UdpMsg um;
+    std::string msg;
+    msg.assign(buf,strlen(buf));
+    um.deserialize(msg);
+
+    std::cout << um.Get_nick_name() <<":" << um.Get_school() <<std::endl;
+    std::cout << um.Get_msg() <<std::endl;
+    return 0;
+
 }

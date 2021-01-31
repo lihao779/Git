@@ -95,6 +95,7 @@ class ChatServer
         static void* ConsumeStart(void* arg); //生产线程
         int RecvMsg();
         int SendMsg();
+        int SendUdpMsg(std::string& msg,struct sockaddr_in addr,socklen_t addrlen);
     private:
         int tcp_sock_;
         int udp_sock_;
@@ -352,14 +353,59 @@ int ChatServer::RecvMsg()
     //1.接收数据
     //2.放入消息池
     char buf[UDP_MAX_DATE] = {0};
-    int recv_size = recvfrom(udp_sock_,buf,sizeof(buf)-1,0,NULL,NULL);
+    struct sockaddr_in addr;
+    socklen_t addrlen = sizeof(addr);
+    int recv_size = recvfrom(udp_sock_,buf,sizeof(buf)-1,0,(struct sockaddr*)&addr,&addrlen);
     if(recv_size < 0)
     {
         return -1;
     }
+    UdpMsg um;
+    std::string msg;
+    msg.assign(buf,strlen(buf));
+    um.deserialize(msg);
+    if(user_manager_->IsLog(um.Get_id(),addr,addrlen) < 0)
+    {
+        return -1;
+    }
+    msg_pool_->PushMsg(msg);
+    return 0;
 }
 int ChatServer::SendMsg()
 {
     //1.从消息池中读取数据
     //2.发送给在线用户
+    std::string msg;
+    msg_pool_->PopMsg(&msg);
+    
+    std::vector<UserInfo> online_user;
+    user_manager_->GetOnlineUer(&online_user); 
+
+    for(size_t i = 0;i < online_user.size();i++)
+    {
+        int ret = SendUdpMsg(msg,online_user[i].GetUserAddr(),online_user[i].GetUserAddrlen());
+        if(ret < 0)
+        {
+            LOG(ERROR,"发送数据失败") << std::endl;
+            return -1;
+        }
+    }
+    return 0;
+}
+int ChatServer::SendUdpMsg(std::string& msg,struct sockaddr_in addr,socklen_t addrlen)
+{
+    int udpsend_max = UDPSEND_MAX;
+    while(udpsend_max--)
+    {
+        int send_size = sendto(udp_sock_,msg.c_str(),msg.size(),0,(struct sockaddr*)&addr,addrlen);
+        if(send_size < 0)
+        {
+            LOG(ERROR,"发送消息败") << " ip is" <<inet_ntoa(addr.sin_addr) << " port is" << ntohs(addr.sin_port) << std::endl;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return -1;
 }
