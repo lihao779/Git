@@ -262,8 +262,6 @@ void* ChatServer::LoginRegisterStart(void* arg)
     ri.resp_status_ = resp_status;
     ri.id_ = user_id; 
     
-    LOG(INFO,"服务端注册或者登录完毕")<<"status:"<<resp_status<<std::endl;
-    std::cout<<"注册id:"<<user_id<<std::endl;
     
     int max_round_count = MAX_ROUND_COUNT;
     while(max_round_count--)
@@ -275,7 +273,6 @@ void* ChatServer::LoginRegisterStart(void* arg)
         }
         else
         {
-            LOG(INFO,"服务端回复注册或者登陆成功")<<std::endl;
             break;
         }
     }
@@ -304,6 +301,7 @@ int ChatServer::DealRegister(TcpConnect* tc,uint32_t* user_id)
     {
         return REGISTER_FAILED;
     }
+    LOG(INFO,"服务端注册完毕")<<"注册id:"<<*user_id<<std::endl;
     return REGISTER_SUCCESS;
 }
 int ChatServer::DealLogin(TcpConnect* tc,uint32_t* user_id)
@@ -327,6 +325,7 @@ int ChatServer::DealLogin(TcpConnect* tc,uint32_t* user_id)
     {
         return LOGIN_FAILED;
     }
+    LOG(INFO,"服务端登录完毕")<<"登录id:"<<*user_id<<std::endl;
     return LOGIN_SUCCESS;
 }
 

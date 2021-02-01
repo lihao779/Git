@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "ChatClient.hpp"
+#include "ChatWindow.hpp"
 
 void Meun()
 {
@@ -33,7 +34,9 @@ int main(int argc,char* argv[])
         return -1;
     }
     
-    UdpClient uc;
+    UdpClient* uc = new UdpClient(ip);
+    ChatWindow* cw = new ChatWindow(); 
+
     while(1)
     {
         Meun();
@@ -44,7 +47,7 @@ int main(int argc,char* argv[])
         if(select == 1)
         {
             //注册逻辑
-            int ret = uc.RegistertoSvr(ip);
+            int ret = uc->RegistertoSvr();
             if(ret < 0)
             {
                 LOG(WARNING,"please retry register") << std::endl;
@@ -53,12 +56,12 @@ int main(int argc,char* argv[])
             {
                 LOG(INFO,"register success ,please login") <<std::endl;
             }
-            uc.CloseFd();
+            uc->CloseFd();
         }
         else if(select == 2)
         {
             //登录逻辑
-           int ret = uc.LogtoSvr(ip); 
+           int ret = uc->LogtoSvr(); 
            if(ret < 0)
            {
                LOG(ERROR,"please retry login") << std::endl;
@@ -66,17 +69,18 @@ int main(int argc,char* argv[])
            else
            {
                LOG(INFO,"login success ,please chatting") <<std::endl;
-               uc.CreateUdpSock();
-               while(1)
-               {
-                    std::string msg;
-                    std::cout << "please enter your msg:";
-                    std::cin >> msg;
-                    uc.SendUdpMsg(msg,ip);     
-                    uc.RecvUdpMsg();
-               }
+               uc->CreateUdpSock();
+               cw->Start(uc);
+               //while(1)
+               //{
+               //     std::string msg;
+               //     std::cout << "please enter your msg:";
+               //     std::cin >> msg;
+               //     uc->SendUdpMsg(msg,ip);     
+               //     uc->RecvUdpMsg();
+               //}
            }
-           uc.CloseFd();
+           uc->CloseFd();
         }
         else if(select == 3)
         {
@@ -88,16 +92,7 @@ int main(int argc,char* argv[])
             LOG(INFO,"eixt chat cliect") << std::endl;
             exit(0);
         }
-        else
-        {
-            //输入错误
-        }
     }
 
-
-    while(1)
-    {
-        sleep(1);
-    }
     return 0;
 }

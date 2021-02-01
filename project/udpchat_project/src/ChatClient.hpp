@@ -9,6 +9,7 @@
 
 #include "ConnectInfo.hpp"
 #include "tools.hpp"
+#include "UserManager.hpp"
 
 
 struct MySelf
@@ -28,26 +29,31 @@ struct MySelf
 class UdpClient
 {
     public:
-    UdpClient()
+    UdpClient(const std::string& ip)
         :tcp_sock_(-1)
          ,udp_sock_(-1)
-    {}
+         ,ip_(ip)
+    {
+    }
     ~UdpClient()
     {}
 
     int CreateUdpSock();
-    int RegistertoSvr(const std::string& ip);
-    int LogtoSvr(const std::string& ip);
-    int SendUdpMsg(const std::string& msg,const std::string& ip);
-    int RecvUdpMsg();
+    int RegistertoSvr();
+    int LogtoSvr();
+    int SendUdpMsg(const std::string& msg);
+    int RecvUdpMsg(std::string* recvmsg);
     void CloseFd();
+    MySelf& GetMe();
+
     private:
     int CreateTCPSock();
-    int ConnecttoSvr(const std::string& ip);
+    int ConnecttoSvr();
     private:
         int tcp_sock_;
         int udp_sock_;
         MySelf me_;
+        std::string ip_;
 };
 int UdpClient::CreateTCPSock()
 {
@@ -70,12 +76,12 @@ int UdpClient::CreateUdpSock()
     }
     return 0;
 }
-int UdpClient::ConnecttoSvr(const std::string& ip)
+int UdpClient::ConnecttoSvr()
 {
     struct sockaddr_in dest_addr;
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(TCP_PORT);
-    dest_addr.sin_addr.s_addr = inet_addr(ip.c_str());
+    dest_addr.sin_addr.s_addr = inet_addr(ip_.c_str());
     int ret = connect(tcp_sock_,(struct sockaddr*)&dest_addr,sizeof(dest_addr));
     if(ret < 0)
     {
@@ -84,14 +90,14 @@ int UdpClient::ConnecttoSvr(const std::string& ip)
     }
     return 0;
 }
-int UdpClient::RegistertoSvr(const std::string& ip)
+int UdpClient::RegistertoSvr()
 {
     int ret = CreateTCPSock();
     if(ret < 0)
     {
         return -1;
     }
-    ret = ConnecttoSvr(ip);
+    ret = ConnecttoSvr();
     if(ret < 0)
         return -1;
     char type = REGISTER_RESQ;
@@ -156,12 +162,12 @@ int UdpClient::RegistertoSvr(const std::string& ip)
     LOG(INFO,"客户端注册成功") << "  [id:" << me_.user_id_ << "]" <<std::endl;
     return 0;
 }
-int UdpClient::LogtoSvr(const std::string& ip)
+int UdpClient::LogtoSvr()
 {
     int ret = CreateTCPSock();
     if(ret < 0)
         return -1;
-    ret = ConnecttoSvr(ip);
+    ret = ConnecttoSvr();
     if(ret < 0)
         return -1;
     char type = LOGIN_RESQ;
@@ -211,27 +217,19 @@ void UdpClient::CloseFd()
         tcp_sock_ = -1;
     }
 }
-int UdpClient::SendUdpMsg(const std::string& msg,const std::string& ip)
+int UdpClient::SendUdpMsg(const std::string& msg)
 {
-    UdpMsg um;
-    um.Get_nick_name() = me_.nick_name_;
-    um.Get_school() = me_.school_;
-    um.Get_msg() = msg;
-    um.Get_id() = me_.user_id_;
-
-    std::string str_msg;
-    um.serialize(&str_msg);
 
     struct sockaddr_in dest_addr;
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(UDP_PORT);
-    dest_addr.sin_addr.s_addr = inet_addr(ip.c_str());
+    dest_addr.sin_addr.s_addr = inet_addr(ip_.c_str());
     socklen_t dest_addrlen = sizeof(dest_addr);
 
     int udpsend_max = UDPSEND_MAX;
     while(udpsend_max--)
     {
-        int ret = sendto(udp_sock_,str_msg.c_str(),str_msg.size(),0,(struct sockaddr*)&dest_addr,dest_addrlen);
+        int ret = sendto(udp_sock_,msg.c_str(),msg.size(),0,(struct sockaddr*)&dest_addr,dest_addrlen);
         if(ret < 0)
         {
             LOG(ERROR,"客户端发送消息失败") << std::endl;
@@ -243,7 +241,7 @@ int UdpClient::SendUdpMsg(const std::string& msg,const std::string& ip)
     }
     return -1;
 }
-int UdpClient::RecvUdpMsg()
+int UdpClient::RecvUdpMsg(std::string* recvmsg)
 {
     char buf[UDP_MAX_DATE] = {0};
     int ret = recvfrom(udp_sock_,buf,sizeof(buf) - 1,0,NULL,NULL);
@@ -252,13 +250,11 @@ int UdpClient::RecvUdpMsg()
         LOG(ERROR,"客户端接收消息失败") << std::endl;
         return -1;
     }
-    UdpMsg um;
-    std::string msg;
-    msg.assign(buf,strlen(buf));
-    um.deserialize(msg);
-
-    std::cout << um.Get_nick_name() <<":" << um.Get_school() <<std::endl;
-    std::cout << um.Get_msg() <<std::endl;
+    (*recvmsg).assign(buf,strlen(buf));
     return 0;
 
+}
+MySelf& UdpClient::GetMe()
+{
+    return me_;
 }

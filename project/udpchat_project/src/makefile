@@ -4,10 +4,10 @@ CLI_BIN = ChatClient
 all:ChatServer ChatClient
 
 $(SVR_BIN):ChatServer.cpp
-	g++ $^ -o $@ -pthread -ljsoncpp  
+	g++ $^ -o $@ -pthread -ljsoncpp -lncurses
 	
 $(CLI_BIN):ChatClient.cpp
-	g++ $^ -o $@ -pthread -ljsoncpp 
+	g++ $^ -o $@ -pthread -ljsoncpp -lncurses
 
 .PHONY:clean
 clean:
