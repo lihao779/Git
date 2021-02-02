@@ -173,7 +173,7 @@ void ChatWindow::RunHeader()
         mvwaddstr(header_,y/2,(x-msg.size()) / 2,msg.c_str());
         Wrefresh(header_);
         oldheader = header_;
-        sleep(1);
+        sleep(10);
     }
 }
 void ChatWindow::Runoutput(UdpClient* uc)
@@ -281,6 +281,6 @@ void ChatWindow::RunUser_list(UdpClient* uc)
             line++;
             it++;
         }
-        sleep(3);
+        sleep(2);
     }
 }
