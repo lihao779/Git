@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 
 #include "ConnectInfo.hpp"
 #include "tools.hpp"
@@ -34,6 +35,7 @@ class UdpClient
          ,udp_sock_(-1)
          ,ip_(ip)
     {
+        //online_.clear();
     }
     ~UdpClient()
     {}
@@ -45,6 +47,7 @@ class UdpClient
     int RecvUdpMsg(std::string* recvmsg);
     void CloseFd();
     MySelf& GetMe();
+    std::unordered_map<uint32_t,UdpMsg>& GetOnline();
 
     private:
     int CreateTCPSock();
@@ -54,6 +57,7 @@ class UdpClient
         int udp_sock_;
         MySelf me_;
         std::string ip_;
+        std::unordered_map<uint32_t,UdpMsg> online_;
 };
 int UdpClient::CreateTCPSock()
 {
@@ -257,4 +261,8 @@ int UdpClient::RecvUdpMsg(std::string* recvmsg)
 MySelf& UdpClient::GetMe()
 {
     return me_;
+}
+std::unordered_map<uint32_t,UdpMsg>& UdpClient::GetOnline()
+{
+        return online_;
 }

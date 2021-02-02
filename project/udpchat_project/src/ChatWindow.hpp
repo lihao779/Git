@@ -136,7 +136,6 @@ void* ChatWindow::RunWindowStart(void* arg)
         case 2:
             //user_list_
             cw->RunUser_list(pram->GetUdpClient());
-            sleep(100);
             break;
         case 3:
             //input_
@@ -199,9 +198,6 @@ void ChatWindow::Runoutput(UdpClient* uc)
         show_msg += um.Get_school();
         show_msg += ":" ;
         show_msg += um.Get_msg();
-        
-
-
         if(line == y - 1)
         {
             line = 1;   
@@ -215,6 +211,9 @@ void ChatWindow::Runoutput(UdpClient* uc)
         mvwaddstr(output_,line,1,show_msg.c_str());
         Wrefresh(output_);
         line++;
+
+        std::unordered_map<uint32_t,UdpMsg>& online = uc->GetOnline();
+        online.insert(std::make_pair(um.Get_id(),um));
     }
 }
 void ChatWindow::RunInput(UdpClient* uc)
@@ -247,25 +246,41 @@ void ChatWindow::RunInput(UdpClient* uc)
         std::string send_msg;
         um.serialize(&send_msg);
 
+        uc->SendUdpMsg(send_msg);
         oldwin = input_;
     }
 }
 void ChatWindow::RunUser_list(UdpClient* uc)
 {
-    WINDOW* oldlist = nullptr;
     while(1)
     {
         user_list_ = newwin(LINES*3/5,COLS/4,LINES/5,COLS*3/4);
         box(user_list_,0,0);
         Wrefresh(user_list_);
-        if(oldlist)
+        int x,y;
+        getmaxyx(user_list_,y,x);
+        int line = 1;
+        std::unordered_map<uint32_t,UdpMsg>& online = uc->GetOnline();
+    
+        auto it = online.begin();
+        while(it != online.end())
         {
-            delwin(oldlist);
-            oldlist = nullptr;
+            std::string msg = it->second.Get_nick_name();
+            msg += ":";
+            msg += it->second.Get_school();
+            if(line == y - 1)
+            {
+                delwin(user_list_);
+                user_list_ = newwin(LINES*3/5,COLS/4,LINES/5,COLS*3/4);
+                box(user_list_,0,0);
+                Wrefresh(user_list_);
+                line = 1;
+            }
+            mvwaddstr(user_list_,line,1,msg.c_str());
+            Wrefresh(user_list_);
+            line++;
+            it++;
         }
-
-        
-        oldlist = user_list_;
-
+        sleep(3);
     }
 }
