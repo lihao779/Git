@@ -166,11 +166,11 @@ void ChatWindow::RunHeader()
             delwin(oldheader);
             oldheader = nullptr;
         }
-        std::string msg = "welcome our chatting";
+        std::string msg = "Internet Chat Room";
 
         int x,y;
         getmaxyx(header_,y,x);
-        mvwaddstr(header_,y/2,(x-msg.size()) / 2,msg.c_str());
+        mvwaddstr(header_,y/2,x/2-msg.size()/2,msg.c_str());
         Wrefresh(header_);
         oldheader = header_;
         sleep(10);
