@@ -2,8 +2,12 @@
 #include <string>
 using namespace std;
 
-struct Sales_date
+class Sales_date
 {
+    friend istream& read(istream& is,Sales_date& date);
+    friend ostream& print(ostream& os,const Sales_date& date);
+    friend Sales_date add(const Sales_date& th1,const Sales_date& th2);
+    public:
     Sales_date() = default;
     Sales_date(const string &s)
         :ISBN(s)
@@ -28,6 +32,7 @@ struct Sales_date
     Sales_date& combine(const Sales_date&);
     double arg_price()const;
 
+    private:
     std::string ISBN;
     unsigned units_sold;
     double revenue;
@@ -84,8 +89,11 @@ Sales_date::Sales_date(istream& is)
 
 
 
-struct Person
+class Person
 {
+    friend ostream& print(ostream& os,const Person& p);
+    friend istream& read(istream& is,Person& p);
+    public:
     Person() = default;
     Person(std::string name,std::string addr)
         :_name(name)
@@ -99,6 +107,7 @@ struct Person
     {
         return _addr;
     }
+    private:
     std::string _name;
     std::string _addr;
 };
