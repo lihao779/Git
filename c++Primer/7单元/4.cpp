@@ -43,7 +43,7 @@ Sales_date& Sales_date::combine(const Sales_date& date)
     revenue += date.revenue;
     return *this;
 }
-double Sales_date::arg_price()const
+inline double Sales_date::arg_price()const
 {
     return revenue / units_sold;
 }
