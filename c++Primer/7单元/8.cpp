@@ -1,10 +1,17 @@
 #include <iostream>
 #include <string>
 using namespace std;
-
+class Sales_date;
+istream& read(Sales_date& date,istream& is = std::cin);
 class Sales_date
 {
-    friend istream& read(istream& is,Sales_date& date);
+    friend istream& read(Sales_date& date,istream& is)
+    {
+        double price;
+        is >> date.ISBN >> date.units_sold >> price;
+        date.revenue = date.units_sold*price;
+        return is;
+    }
     friend ostream& print(ostream& os,const Sales_date& date);
     friend Sales_date add(const Sales_date& th1,const Sales_date& th2);
     public:
@@ -17,7 +24,7 @@ class Sales_date
          ,units_sold(n)
          ,revenue(p*n)
     {}
-    Sales_date(istream& is)
+    Sales_date(istream& is = std::cin)
     {
         double price = 0;
         is >> ISBN >> units_sold >> price;
@@ -50,13 +57,7 @@ inline double Sales_date::arg_price()const
 
 ///////////////////////////
 //类外
-istream& read(istream& is,Sales_date& date)
-{
-    double price;
-    is >> date.ISBN >> date.units_sold >> price;
-    date.revenue = date.units_sold*price;
-    return is;
-}
+
 ostream& print(ostream& os,const Sales_date& date)
 {
     os << date.isbn() <<" "<< date.units_sold << " "<< date.revenue <<" "
@@ -72,11 +73,11 @@ Sales_date add(const Sales_date& th1,const Sales_date& th2)
 
 //构造
 /*
-Sales_date::Sales_date(istream& is)
-{
-    read(is,*this);
-}
-*/
+   Sales_date::Sales_date(istream& is)
+   {
+   read(is,*this);
+   }
+   */
 
 
 
@@ -123,15 +124,15 @@ istream& read(istream& is,Person& p)
 }
 ////
 /*
-ostream& print(ostream& os,const Person& p)
-{
-    os << p.Name() << " " << p.Addr();
-    return os;
-}
-istream& read(istream& is,Person& p)
-{
-    is >> p._name >>p._addr;
-    return is;
-}
-*/
+   ostream& print(ostream& os,const Person& p)
+   {
+   os << p.Name() << " " << p.Addr();
+   return os;
+   }
+   istream& read(istream& is,Person& p)
+   {
+   is >> p._name >>p._addr;
+   return is;
+   }
+   */
 

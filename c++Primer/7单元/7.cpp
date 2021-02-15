@@ -12,12 +12,16 @@ class Window_mgr
         {
             screen.clear();
         }
-
+        ScreenIndex addScreen(Screen& s);
         void clear(ScreenIndex);
     private:
         std::vector<Screen> screen;
 };
-
+Window_mgr::ScreenIndex Window_mgr::addScreen(Screen& s)
+{
+    screen.push_back(s);
+    return screen.size() - 1;
+}
 class Screen
 {
     public:
@@ -49,6 +53,8 @@ class Screen
         
         const Screen& display(std::ostream& os)const;
         Screen& display(std::ostream& os);
+        pos size()const;
+        void dummy_fuc(pos height);
     private:
         void do_display(std::ostream& os)const 
         {
@@ -91,6 +97,14 @@ Screen& Screen::display(std::ostream& os)
 {
     do_display(os);
     return *this;
+}
+Screen::pos Screen::size()const
+{
+    return height * width;
+}
+void Screen::dummy_fuc(pos height)
+{
+    cursor = width * height;
 }
 
 
