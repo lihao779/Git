@@ -12,7 +12,8 @@ class Sale_date
             :book_(book)
              ,count_(count)
              ,totalprice_(price * count)
-        {}
+    {
+    }
         Sale_date(string s)
             :Sale_date(s,0,0)
         {}
@@ -26,7 +27,6 @@ class Sale_date
         int count_;
         double totalprice_;
 };
-
 istream& read(istream& is,Sale_date& s)
 {
     double price = 0;
