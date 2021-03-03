@@ -18,10 +18,10 @@ int main()
     if(ifs)
     {
         std::string line;
-        std::istringstream istr; 
-        People people;
         while(getline(ifs,line))
         {
+            People people;
+            std::istringstream istr; 
             istr.str(line);
             istr >> people.name;
             std::string temp;
@@ -29,8 +29,8 @@ int main()
             {
                 people.phone.push_back(temp);
             }
+            vec.push_back(people);
         }
-        vec.push_back(people);
     }
     else
     {
@@ -46,6 +46,36 @@ int main()
             std::cout << vec[i].phone[j] << " ";
         }
         std::cout << std::endl;
+    }
+    //判断电话号码正确性
+    for(size_t i = 0;i < vec.size();i++)
+    {
+        std::string badnum,goodnum;
+        for(size_t j = 0;j < vec[i].phone.size();j++)
+        {
+            if(vec[i].phone[j].size() != 11)
+            {
+                //错误
+                badnum += vec[i].phone[j];
+                badnum += " ";
+            }
+            else 
+            {
+                //正确
+                goodnum += vec[i].phone[j];
+                goodnum += " ";
+            }
+        }
+        if(badnum.size() == 0)
+        {
+            std::cout << "信息正确" << std::endl;
+            std::cout << "name:" << vec[i].name <<" phone:" << goodnum << std::endl;
+        }
+        else
+        {
+            std::cout << "信息错误" << std::endl;
+            std::cout << "name:" << vec[i].name <<" bad-phone:" << badnum <<" good-phone:" << goodnum << std::endl;
+        }
     }
     return 0;
 }
