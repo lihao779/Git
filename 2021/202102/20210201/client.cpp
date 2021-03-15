@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#include <string.h>
 #include <iostream>
 int sockfd;
 
@@ -17,23 +17,25 @@ void hander(int sig)
 }
 int main()
 {
-    signal(SIGIO,hander);
+    //signal(SIGIO,hander);
     sockfd = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(19999);
     addr.sin_addr.s_addr = inet_addr("0.0.0.0");
     
-    fcntl(sockfd,F_SETOWN,getpid());
-    int flag = fcntl(sockfd,F_GETFL,0);
-    flag |= O_NONBLOCK;
-    flag |= O_ASYNC;
-    fcntl(sockfd,F_SETFL,flag);
+    //fcntl(sockfd,F_SETOWN,getpid());
+    //int flag = fcntl(sockfd,F_GETFL,0);
+    //flag |= O_NONBLOCK;
+    //flag |= O_ASYNC;
+    //fcntl(sockfd,F_SETFL,flag);
 
     connect(sockfd,(struct sockaddr*)&addr,sizeof(addr));
     while(1)
     {
-        sleep(1);
+        char buf[1024] = "hello";
+        send(sockfd, buf, strlen(buf), 0);
+        sleep(3);
     }
     return 0;
 }

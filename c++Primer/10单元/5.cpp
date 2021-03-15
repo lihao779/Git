@@ -2,8 +2,14 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <functional>
 using namespace std;
+using namespace std::placeholders;
 
+bool check_size(const string& str,size_t sz)
+{
+    return str.size() >= sz;
+}
 int i = 2;
 int main()
 {
@@ -22,9 +28,10 @@ int main()
     size_t count = 5;
 
 
-    auto pit = partition(vec.begin(),vec.end(),[count](const string& s){return s.size() >= count;});
+    //auto pit = partition(vec.begin(),vec.end(),[count](const string& s){return s.size() >= count;});
+    auto pit = partition(vec.begin(),vec.end(),bind(check_size,_1,count));
 
-    cout << "have " << pit-vec.begin() << " ele_size big than " << count << endl;
+    cout << "have " << pit - vec.begin() << " ele_size big than " << count << endl;
     for(auto i = vec.begin();i != pit;i++)
     {
         cout << *i << " ";
