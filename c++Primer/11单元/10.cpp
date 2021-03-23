@@ -2,13 +2,15 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <unordered_map>
 #include <string>
 
 using namespace std;
 
 map<string, string> buildMap(ifstream& map_file)
 {
-    map<string, string> imap;
+    //unordered_map<string, string> imap;
+   map<string, string> imap;
     string s;
     while(getline(map_file, s))
     {
@@ -37,8 +39,8 @@ void word_transform(ifstream& map_file, ifstream& input)
             else
             {
                 result += temp;
-                result += " ";
             }
+            result += " ";
         }
     }
     cout << result << endl;
