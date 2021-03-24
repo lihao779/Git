@@ -13,16 +13,16 @@ class HasPtr
     {
         cout << "HasPtr(const string& s) " << this << endl;
     }
-        //HasPtr(const HasPtr& s)
-        //    :ps(new string(*s.ps))
-        //     ,i(s.i)
-        //{}
-        //HasPtr& operator=(const HasPtr& p)
-        //{
-        //    *ps = *p.ps;
-        //    i = p.i;
-        //    return *this;
-        //}
+        HasPtr(const HasPtr& s)
+            :ps(new string(*s.ps))
+             ,i(s.i)
+        {}
+        HasPtr& operator=(const HasPtr& p)
+        {
+            *ps = *p.ps;
+            i = p.i;
+            return *this;
+        }
         ~HasPtr()
         {
             cout << "~HasPtr()" << endl;
@@ -38,7 +38,7 @@ class HasPtr
 
 void f(HasPtr p)
 {
-//    HasPtr ret = p;
+    HasPtr ret = p;
 }
 
 int main()
