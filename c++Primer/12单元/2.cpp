@@ -17,6 +17,9 @@ class StrBlob
     StrBlob(initializer_list<string> li)
         :data(make_shared<vector<string>>(li))
     {}
+
+    
+
     
     size_type size()
     {

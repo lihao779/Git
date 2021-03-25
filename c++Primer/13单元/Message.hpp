@@ -24,6 +24,14 @@ class Message
 
     Message& operator=(const Message& m);
 
+    ~Message();
+
+    void save(Folder* p){ fol.insert(p); p->AddMsg(this);}
+    void remove(Folder* p){ fol.erase(p); p->DelMsg(this);}
+    void swap(Message&);
+    void AddFol(Folder* p){ fol.insert(p); p->AddMsg(this);}
+    void DelFol(Folder* p){ fol.erase(p); p->DelMsg(this); }
+
     private:
     void PushMsgToFol();
     void PopMsgToFol();
@@ -64,8 +72,36 @@ Message& Message::operator=(const Message& m)
     if(this != &m)
     {
         //先将旧的消息从对应的文件夹中拿掉
+        PopMsgToFol();
+        msg = m.msg;
+        fol = m.fol;
         //再将新的消息写入&将新消息所在文件
-        
+        PushMsgToFol();
     }
     return *this;
+}
+
+Message::~Message()
+{
+    PopMsgToFol();
+}
+void Message::swap(Message& m)
+{
+    if(&m != this)
+    {
+        auto it = fol.begin();
+        while(it != fol.end())
+        {
+            (*it)->AddMsg(&m);
+            (*it)->DelMsg(this);
+        }
+        it = m.fol.begin();
+        while(it != m.fol.end())
+        {
+            (*it)->AddMsg(this);
+            (*it)->DelMsg(&m);
+        }
+        msg.swap(m.msg);
+        fol.swap(m.fol);
+    }
 }
