@@ -6,7 +6,9 @@ class String
         String()
             :element(nullptr), first_last(nullptr), cap(nullptr){}
         String(const String&);
+        String(String&&);
         String& operator=(const String&);
+        String& operator=(String&&);
         ~String();
 
         size_t size() { return first_last - element; }
@@ -68,7 +70,6 @@ String::String(const String& s)
     auto it = alloc_n_copy(s.begin(), s.end());
     element = it.first;
     first_last = cap = it.second;
-    std::cout << "String(const String&)" << std::endl;
 }
       
 String& String::operator=(const String& s)
@@ -81,6 +82,25 @@ String& String::operator=(const String& s)
         first_last = cap = it.second;
     }
     return *this;
+}
+String::String(String&& s)
+{
+    element = s.element;
+    first_last = s.first_last;
+    cap = s.cap;
+    s.element = s.first_last = s.cap = nullptr;
+}
+String& String::operator=(String&& s)
+{
+   if(&s != this)
+   {
+       free();
+       element = s.element;
+       first_last = s.first_last;
+       cap = s.cap;
+       s.element = s.cap = s.first_last = nullptr;
+   }
+   return *this;
 }
 
 String::~String()

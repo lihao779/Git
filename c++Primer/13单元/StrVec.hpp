@@ -6,10 +6,13 @@ class StrVec
         StrVec()
             :elements(nullptr), first_free(nullptr), cap(nullptr){}
         StrVec(const StrVec&);
+        StrVec(StrVec&&) noexcept;
         StrVec& operator=(const StrVec&);
+        StrVec& operator=(StrVec&&) noexcept;
         ~StrVec();
 
         void push_back(const std::string& s);
+        void push_back(std::string&& s);
         size_t size() { return first_free - elements; }
         size_t capacity() { return cap - elements; }
         std::string* begin()const { return elements; }
@@ -39,6 +42,11 @@ StrVec::StrVec(const StrVec& s)
     cap = it.second;
 }
 
+StrVec::StrVec(StrVec&& s) noexcept
+    :elements(s.elements), first_free(s.first_free), cap(s.cap)
+{
+    s.first_free = s.elements = s.cap = nullptr;
+}
 StrVec& StrVec::operator=(const StrVec& s)
 {
     if(&s != this)
@@ -52,6 +60,18 @@ StrVec& StrVec::operator=(const StrVec& s)
     return *this;
 }
 
+StrVec& StrVec::operator=(StrVec&& s) noexcept
+{
+    if(this != &s)
+    {
+        free();
+        elements = s.elements;
+        first_free = s.first_free;
+        cap = s.cap;
+        s.elements = s.first_free = s.cap = nullptr;
+    }
+    return *this;
+}
 StrVec::~StrVec()
 {
     free();
@@ -61,6 +81,11 @@ void StrVec::push_back(const std::string& s)
 {
     chk_n_alloc();
     allo.construct(first_free++, s);
+}
+void StrVec::push_back(std::string&& s)
+{
+    chk_n_alloc();
+    allo.construct(first_free++, std::move(s));
 }
 
 std::pair<std::string*, std::string*> StrVec::alloc_n_copy(std::string* b, std::string* e)
