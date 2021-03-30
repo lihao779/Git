@@ -1,7 +1,8 @@
-
+#include <iostream>
 #include <memory>
 class String
 {
+    friend std::ostream& operator<<(std::ostream&, const String&);
     public:
         String()
             :element(nullptr), first_last(nullptr), cap(nullptr){}
@@ -112,4 +113,12 @@ void String::push_back(const char& c)
 {
    chk_n_alloc();
    *first_last++ = c;
+}
+
+std::ostream& operator<<(std::ostream& os, const String& s)
+{
+    auto it = s.begin();
+    while(it != s.end())
+        os << *it;
+   return os; 
 }
