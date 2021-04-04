@@ -7,7 +7,9 @@ class Blob
         typedef T value_type;
         typedef typename std::vector<T>::size_type size_type;
     public:
-        Blob() = default;
+        Blob()
+            :data(std::make_shared<std::vector<T>>())
+        {}
         Blob(const Blob& b)
             :data(b.data)
         {}
@@ -45,8 +47,15 @@ class Blob
             return (*data)[index];
         }
 
-
+    private:
+        void check(size_type i, const std::string msg)const;
     private:
         std::shared_ptr<std::vector<T>> data;
     
 };
+template<typename T>
+inline void Blob<T>::check(size_type i, const std::string msg)const
+{
+    if(i >= data->size())
+        throw std::out_of_range(msg);
+}
