@@ -1,0 +1,177 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CAPACITY	ConnectInfo.hpp	11;"	d
+CLI_BIN	makefile	/^CLI_BIN = ChatClient$/;"	m
+ChatServer	ChatServer.hpp	/^        ChatServer()$/;"	f	class:ChatServer
+ChatServer	ChatServer.hpp	/^class ChatServer$/;"	c
+ChatWindow	ChatWindow.hpp	/^        ChatWindow()$/;"	f	class:ChatWindow
+ChatWindow	ChatWindow.hpp	/^class ChatWindow$/;"	c
+CloseFd	ChatClient.hpp	/^void UdpClient::CloseFd()$/;"	f	class:UdpClient
+ConnecttoSvr	ChatClient.hpp	/^int UdpClient::ConnecttoSvr()$/;"	f	class:UdpClient
+ConsumeStart	ChatServer.hpp	/^void* ChatServer::ConsumeStart(void* arg)$/;"	f	class:ChatServer
+CreateTCPSock	ChatClient.hpp	/^int UdpClient::CreateTCPSock()$/;"	f	class:UdpClient
+CreateUdpSock	ChatClient.hpp	/^int UdpClient::CreateUdpSock()$/;"	f	class:UdpClient
+DEBUG	tools.hpp	/^    DEBUG$/;"	e	enum:LogLevel
+DealLogin	ChatServer.hpp	/^int ChatServer::DealLogin(TcpConnect* tc,uint32_t* user_id)$/;"	f	class:ChatServer
+DealLogin	UserManager.hpp	/^int UserManage::DealLogin(uint32_t id,const std::string& passwd)$/;"	f	class:UserManage
+DealRegister	ChatServer.hpp	/^int ChatServer::DealRegister(TcpConnect* tc,uint32_t* user_id)$/;"	f	class:ChatServer
+DealRegister	UserManager.hpp	/^int UserManage::DealRegister(const std::string& nick_name,const std::string& school,const std::string passwd,uint32_t* user_id)$/;"	f	class:UserManage
+ERROR	tools.hpp	/^    ERROR,$/;"	e	enum:LogLevel
+FATAL	tools.hpp	/^    FATAL,$/;"	e	enum:LogLevel
+GetChatWindow_this	ChatWindow.hpp	/^ChatWindow* Pram::GetChatWindow_this()$/;"	f	class:Pram
+GetMe	ChatClient.hpp	/^MySelf& UdpClient::GetMe()$/;"	f	class:UdpClient
+GetOnline	ChatClient.hpp	/^std::unordered_map<uint32_t,UdpMsg>& UdpClient::GetOnline()$/;"	f	class:UdpClient
+GetOnlineUer	UserManager.hpp	/^void UserManage::GetOnlineUer(std::vector<UserInfo>* vec)$/;"	f	class:UserManage
+GetPasswd	UserManager.hpp	/^const std::string UserInfo::GetPasswd()$/;"	f	class:UserInfo
+GetScokfd	ChatServer.hpp	/^int TcpConnect::GetScokfd()$/;"	f	class:TcpConnect
+GetServer	ChatServer.hpp	/^void* TcpConnect::GetServer()$/;"	f	class:TcpConnect
+GetThread_num	ChatWindow.hpp	/^int Pram::GetThread_num()$/;"	f	class:Pram
+GetTimeStamp	tools.hpp	/^        static void GetTimeStamp(std::string& timeStamp)$/;"	f	class:TimeStamp
+GetUdpClient	ChatWindow.hpp	/^UdpClient* Pram::GetUdpClient()$/;"	f	class:Pram
+GetUserAddr	UserManager.hpp	/^struct sockaddr_in UserInfo::GetUserAddr()$/;"	f	class:UserInfo
+GetUserAddrlen	UserManager.hpp	/^socklen_t UserInfo::GetUserAddrlen()$/;"	f	class:UserInfo
+GetUserStatus	UserManager.hpp	/^int UserInfo::GetUserStatus()$/;"	f	class:UserInfo
+Get_id	ConnectInfo.hpp	/^uint32_t& UdpMsg::Get_id()$/;"	f	class:UdpMsg
+Get_msg	ConnectInfo.hpp	/^std::string& UdpMsg::Get_msg()$/;"	f	class:UdpMsg
+Get_nick_name	ConnectInfo.hpp	/^std::string& UdpMsg::Get_nick_name()$/;"	f	class:UdpMsg
+Get_school	ConnectInfo.hpp	/^std::string& UdpMsg::Get_school()$/;"	f	class:UdpMsg
+INFO	tools.hpp	/^    INFO = 0,$/;"	e	enum:LogLevel
+InitSvr	ChatServer.hpp	/^int ChatServer::InitSvr(uint16_t tcp_port,uint16_t udp_port)$/;"	f	class:ChatServer
+IsLog	UserManager.hpp	/^int UserManage::IsLog(uint32_t user_id,struct sockaddr_in addr,socklen_t addrlen)$/;"	f	class:UserManage
+LOG	tools.hpp	53;"	d
+LOGIN_FAILED	ConnectInfo.hpp	/^    LOGIN_FAILED,$/;"	e	enum:Status
+LOGIN_RESQ	ConnectInfo.hpp	/^    LOGIN_RESQ$/;"	e	enum:Resq_type
+LOGIN_SUCCESS	ConnectInfo.hpp	/^    LOGIN_SUCCESS,$/;"	e	enum:Status
+LevelInfo	tools.hpp	/^const char* LevelInfo[] = $/;"	v
+Log	tools.hpp	/^std::ostream& Log(LogLevel log,const char* file,int line,const std::string& msg)$/;"	f
+LogLevel	tools.hpp	/^enum LogLevel$/;"	g
+LoginInfo	ConnectInfo.hpp	/^    LoginInfo()$/;"	f	struct:LoginInfo
+LoginInfo	ConnectInfo.hpp	/^struct LoginInfo$/;"	s
+LoginRegisterStart	ChatServer.hpp	/^void* ChatServer::LoginRegisterStart(void* arg)$/;"	f	class:ChatServer
+LogtoSvr	ChatClient.hpp	/^int UdpClient::LogtoSvr()$/;"	f	class:UdpClient
+MAX_ROUND_COUNT	ChatServer.hpp	18;"	d
+Meun	ChatClient.cpp	/^void Meun()$/;"	f
+MsgPool	MessagePool.hpp	/^        MsgPool(int capacity = CAPACITY)$/;"	f	class:MsgPool
+MsgPool	MessagePool.hpp	/^class MsgPool$/;"	c
+MySelf	ChatClient.hpp	/^    MySelf()$/;"	f	struct:MySelf
+MySelf	ChatClient.hpp	/^struct MySelf$/;"	s
+ONLINE	ConnectInfo.hpp	/^    ONLINE$/;"	e	enum:Status
+PTHREAD_COUNT	ChatServer.hpp	19;"	d
+PopMsg	MessagePool.hpp	/^void MsgPool::PopMsg(std::string* s)$/;"	f	class:MsgPool
+Pram	ChatWindow.hpp	/^        Pram(int thread_num,ChatWindow* cw,UdpClient* uc)$/;"	f	class:Pram
+Pram	ChatWindow.hpp	/^class Pram$/;"	c
+ProductStart	ChatServer.hpp	/^void* ChatServer::ProductStart(void* arg)$/;"	f	class:ChatServer
+PushMsg	MessagePool.hpp	/^void MsgPool::PushMsg(const std::string& s)$/;"	f	class:MsgPool
+REGISTER_FAILED	ConnectInfo.hpp	/^    REGISTER_FAILED = 0,$/;"	e	enum:Status
+REGISTER_RESQ	ConnectInfo.hpp	/^    REGISTER_RESQ = 0,$/;"	e	enum:Resq_type
+REGISTER_SUCCESS	ConnectInfo.hpp	/^    REGISTER_SUCCESS,$/;"	e	enum:Status
+RecvMsg	ChatServer.hpp	/^int ChatServer::RecvMsg()$/;"	f	class:ChatServer
+RecvUdpMsg	ChatClient.hpp	/^int UdpClient::RecvUdpMsg(std::string* recvmsg)$/;"	f	class:UdpClient
+RegisterInfo	ConnectInfo.hpp	/^    RegisterInfo()$/;"	f	struct:RegisterInfo
+RegisterInfo	ConnectInfo.hpp	/^struct RegisterInfo$/;"	s
+RegistertoSvr	ChatClient.hpp	/^int UdpClient::RegistertoSvr()$/;"	f	class:UdpClient
+ReplyInfo	ConnectInfo.hpp	/^struct ReplyInfo$/;"	s
+Resq_type	ConnectInfo.hpp	/^enum Resq_type$/;"	g
+RunHeader	ChatWindow.hpp	/^void ChatWindow::RunHeader()$/;"	f	class:ChatWindow
+RunInput	ChatWindow.hpp	/^void ChatWindow::RunInput(UdpClient* uc)$/;"	f	class:ChatWindow
+RunUser_list	ChatWindow.hpp	/^void ChatWindow::RunUser_list(UdpClient* uc)$/;"	f	class:ChatWindow
+RunWindowStart	ChatWindow.hpp	/^void* ChatWindow::RunWindowStart(void* arg)$/;"	f	class:ChatWindow
+Runoutput	ChatWindow.hpp	/^void ChatWindow::Runoutput(UdpClient* uc)$/;"	f	class:ChatWindow
+SVR_BIN	makefile	/^SVR_BIN = ChatServer$/;"	m
+SendMsg	ChatServer.hpp	/^int ChatServer::SendMsg()$/;"	f	class:ChatServer
+SendUdpMsg	ChatClient.hpp	/^int UdpClient::SendUdpMsg(const std::string& msg)$/;"	f	class:UdpClient
+SendUdpMsg	ChatServer.hpp	/^int ChatServer::SendUdpMsg(std::string& msg,struct sockaddr_in addr,socklen_t addrlen)$/;"	f	class:ChatServer
+SetScokfd	ChatServer.hpp	/^void TcpConnect::SetScokfd(int fd)$/;"	f	class:TcpConnect
+SetServer	ChatServer.hpp	/^void TcpConnect::SetServer(void* server)$/;"	f	class:TcpConnect
+SetUserAddr	UserManager.hpp	/^void UserInfo::SetUserAddr(struct sockaddr_in addr)$/;"	f	class:UserInfo
+SetUserAddrlen	UserManager.hpp	/^void UserInfo::SetUserAddrlen(const socklen_t len)$/;"	f	class:UserInfo
+SetUserStatus	UserManager.hpp	/^void UserInfo::SetUserStatus(int status)$/;"	f	class:UserInfo
+Start	ChatServer.hpp	/^int ChatServer::Start()$/;"	f	class:ChatServer
+Start	ChatWindow.hpp	/^int ChatWindow::Start(UdpClient* uc)$/;"	f	class:ChatWindow
+Status	ConnectInfo.hpp	/^enum Status$/;"	g
+TCP_PORT	ConnectInfo.hpp	9;"	d
+TcpConnect	ChatServer.hpp	/^        TcpConnect()$/;"	f	class:TcpConnect
+TcpConnect	ChatServer.hpp	/^class TcpConnect$/;"	c
+TimeStamp	tools.hpp	/^class TimeStamp$/;"	c
+UDPSEND_MAX	ConnectInfo.hpp	13;"	d
+UDP_MAX_DATE	ConnectInfo.hpp	12;"	d
+UDP_PORT	ConnectInfo.hpp	10;"	d
+UdpClient	ChatClient.hpp	/^    UdpClient(const std::string& ip)$/;"	f	class:UdpClient
+UdpClient	ChatClient.hpp	/^class UdpClient$/;"	c
+UdpMsg	ConnectInfo.hpp	/^        UdpMsg()$/;"	f	class:UdpMsg
+UdpMsg	ConnectInfo.hpp	/^class UdpMsg$/;"	c
+UserInfo	UserManager.hpp	/^        UserInfo(std::string nick_name,std::string school,std::string passwd,uint32_t userid)$/;"	f	class:UserInfo
+UserInfo	UserManager.hpp	/^class UserInfo$/;"	c
+UserManage	UserManager.hpp	/^        UserManage()$/;"	f	class:UserManage
+UserManage	UserManager.hpp	/^class UserManage$/;"	c
+WARNING	tools.hpp	/^    WARNING,$/;"	e	enum:LogLevel
+Wrefresh	ChatWindow.hpp	/^void ChatWindow::Wrefresh(WINDOW* win)$/;"	f	class:ChatWindow
+addr_	UserManager.hpp	/^        struct sockaddr_in addr_;$/;"	m	class:UserInfo	typeref:struct:UserInfo::sockaddr_in
+addrlen_	UserManager.hpp	/^        socklen_t addrlen_;$/;"	m	class:UserInfo
+capacity_	MessagePool.hpp	/^    size_t capacity_;$/;"	m	class:MsgPool
+con_cond_	MessagePool.hpp	/^    pthread_cond_t con_cond_;$/;"	m	class:MsgPool
+con_tid_	ChatServer.hpp	/^        pthread_t con_tid_[PTHREAD_COUNT];$/;"	m	class:ChatServer
+cw_	ChatWindow.hpp	/^        ChatWindow* cw_;$/;"	m	class:Pram
+deserialize	ConnectInfo.hpp	/^void UdpMsg::deserialize(const std::string msg)$/;"	f	class:UdpMsg
+header_	ChatWindow.hpp	/^        WINDOW* header_;$/;"	m	class:ChatWindow
+id_	ConnectInfo.hpp	/^        uint32_t id_;$/;"	m	class:UdpMsg
+id_	ConnectInfo.hpp	/^    uint32_t id_;$/;"	m	struct:LoginInfo
+id_	ConnectInfo.hpp	/^    uint32_t id_;$/;"	m	struct:ReplyInfo
+input_	ChatWindow.hpp	/^        WINDOW* input_;$/;"	m	class:ChatWindow
+ip_	ChatClient.hpp	/^        std::string ip_;$/;"	m	class:UdpClient
+main	ChatClient.cpp	/^int main(int argc,char* argv[])$/;"	f
+main	ChatServer.cpp	/^int main()$/;"	f
+map_lock_	UserManager.hpp	/^        pthread_mutex_t map_lock_;\/\/ 保护user_map的线程安全$/;"	m	class:UserManage
+me_	ChatClient.hpp	/^        MySelf me_;$/;"	m	class:UdpClient
+msg_	ConnectInfo.hpp	/^        std::string msg_;$/;"	m	class:UdpMsg
+msg_	MessagePool.hpp	/^    std::queue<std::string> msg_;$/;"	m	class:MsgPool
+msg_lock_	MessagePool.hpp	/^    pthread_mutex_t msg_lock_;$/;"	m	class:MsgPool
+msg_pool_	ChatServer.hpp	/^        MsgPool* msg_pool_; $/;"	m	class:ChatServer
+new_sock_	ChatServer.hpp	/^        int new_sock_;$/;"	m	class:TcpConnect
+nick_name_	ChatClient.hpp	/^    std::string nick_name_;$/;"	m	struct:MySelf
+nick_name_	ConnectInfo.hpp	/^        std::string nick_name_;$/;"	m	class:UdpMsg
+nick_name_	ConnectInfo.hpp	/^    char nick_name_[20]; \/\/昵称$/;"	m	struct:RegisterInfo
+nick_name_	UserManager.hpp	/^        std::string nick_name_;$/;"	m	class:UserInfo
+online_	ChatClient.hpp	/^        std::unordered_map<uint32_t,UdpMsg> online_;$/;"	m	class:UdpClient
+online_user_	UserManager.hpp	/^        std::vector<UserInfo> online_user_;\/\/保存在线用户$/;"	m	class:UserManage
+output_	ChatWindow.hpp	/^        WINDOW* output_;$/;"	m	class:ChatWindow
+passwd_	ChatClient.hpp	/^    std::string passwd_;$/;"	m	struct:MySelf
+passwd_	ConnectInfo.hpp	/^    char passwd_[20]; \/\/ 密码$/;"	m	struct:RegisterInfo
+passwd_	ConnectInfo.hpp	/^    char passwd_[20];$/;"	m	struct:LoginInfo
+passwd_	UserManager.hpp	/^        std::string passwd_;$/;"	m	class:UserInfo
+prepare_id_	UserManager.hpp	/^        uint32_t prepare_id_; \/\/预分配id$/;"	m	class:UserManage
+pro_cond_	MessagePool.hpp	/^    pthread_cond_t pro_cond_;$/;"	m	class:MsgPool
+pro_tid_	ChatServer.hpp	/^        pthread_t pro_tid_[PTHREAD_COUNT];$/;"	m	class:ChatServer
+resp_status_	ConnectInfo.hpp	/^    int resp_status_;$/;"	m	struct:ReplyInfo
+school_	ChatClient.hpp	/^    std::string school_;$/;"	m	struct:MySelf
+school_	ConnectInfo.hpp	/^        std::string school_;$/;"	m	class:UdpMsg
+school_	ConnectInfo.hpp	/^    char school_[20]; \/\/ 学校$/;"	m	struct:RegisterInfo
+school_	UserManager.hpp	/^        std::string school_;$/;"	m	class:UserInfo
+serialize	ConnectInfo.hpp	/^void UdpMsg::serialize(std::string* msg)$/;"	f	class:UdpMsg
+server_	ChatServer.hpp	/^        void* server_;\/\/保存ChatServer的this指针$/;"	m	class:TcpConnect
+tcp_sock_	ChatClient.hpp	/^        int tcp_sock_;$/;"	m	class:UdpClient
+tcp_sock_	ChatServer.hpp	/^        int tcp_sock_;$/;"	m	class:ChatServer
+thread_num_	ChatWindow.hpp	/^        int thread_num_;$/;"	m	class:Pram
+tid_	ChatWindow.hpp	/^        std::vector<pthread_t> tid_;$/;"	m	class:ChatWindow
+uc_	ChatWindow.hpp	/^        UdpClient* uc_; $/;"	m	class:Pram
+udp_sock_	ChatClient.hpp	/^        int udp_sock_;$/;"	m	class:UdpClient
+udp_sock_	ChatServer.hpp	/^        int udp_sock_;$/;"	m	class:ChatServer
+user_id_	ChatClient.hpp	/^    uint32_t user_id_;$/;"	m	struct:MySelf
+user_list_	ChatWindow.hpp	/^        WINDOW* user_list_;$/;"	m	class:ChatWindow
+user_manager_	ChatServer.hpp	/^        UserManage* user_manager_; $/;"	m	class:ChatServer
+user_map_	UserManager.hpp	/^        std::unordered_map<uint32_t,UserInfo> user_map_;\/\/key-value(id-usermessage)$/;"	m	class:UserManage
+user_status_	UserManager.hpp	/^        int user_status_;$/;"	m	class:UserInfo
+userid_	UserManager.hpp	/^        uint32_t userid_;\/\/用户id$/;"	m	class:UserInfo
+window_lock_	ChatWindow.hpp	/^        pthread_mutex_t window_lock_;$/;"	m	class:ChatWindow
+~ChatServer	ChatServer.hpp	/^        ~ChatServer()$/;"	f	class:ChatServer
+~ChatWindow	ChatWindow.hpp	/^        ~ChatWindow()$/;"	f	class:ChatWindow
+~MsgPool	MessagePool.hpp	/^        ~MsgPool()$/;"	f	class:MsgPool
+~TcpConnect	ChatServer.hpp	/^        ~TcpConnect()$/;"	f	class:TcpConnect
+~UdpClient	ChatClient.hpp	/^    ~UdpClient()$/;"	f	class:UdpClient
+~UdpMsg	ConnectInfo.hpp	/^        ~UdpMsg()$/;"	f	class:UdpMsg
+~UserInfo	UserManager.hpp	/^        ~UserInfo()$/;"	f	class:UserInfo
+~UserManage	UserManager.hpp	/^        ~UserManage()$/;"	f	class:UserManage
