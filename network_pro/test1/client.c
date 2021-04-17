@@ -5,14 +5,18 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
-
-#define SVRPORT  20
+#define SVRPORT  9000
 
 void str_cli(FILE*, int);
+void handler(int)
+{
+    printf("SIGPIPE\n");
+}
 int main(int argc, char* argv[])
 {
-
+    signal(SIGPIPE, handler);
     if(argc != 2)
     {
         printf("using: ./tcpcli <server_address>");
@@ -53,7 +57,10 @@ void str_cli(FILE* pf, int sockfd)
     while(fgets(sendbuf, sizeof(sendbuf) - 1, pf) != NULL)
     {
         write(sockfd, sendbuf, strlen(sendbuf));
-
+        sleep(1);
+        printf("111\n");
+        write(sockfd, sendbuf, strlen(sendbuf));
+        sleep(3);
         if(read(sockfd, recvbuf, sizeof(recvbuf)) == 0)
         {
             perror("read error");

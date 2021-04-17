@@ -98,8 +98,19 @@ void str_echo(int connfd)
 {
     int n = 0;
     char buf[BUFSIZE] = {0};
+    int left, right;
     while((n = read(connfd, buf, sizeof(buf) - 1)) > 0)
     {
+        if(sscanf(buf, "%d %d",&left, &right) == 2)
+        {
+            memset(buf, '\0', sizeof(buf));
+            snprintf(buf, sizeof(buf) - 1, "%d\n", left + right);
+        }
+        else
+        {
+            memset(buf, '\0', sizeof(buf));
+            snprintf(buf, sizeof(buf) - 1, "input error\n");
+        }
         write(connfd, buf, n);
     }
     if(n < 0)
