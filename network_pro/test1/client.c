@@ -49,7 +49,121 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+#define BUFSIZE 1024
+void str_cli(FILE* pf, int sockfd)
+{
+    fd_set rset;
+    FD_ZERO(&rset);
+    char buf[BUFSIZE] = {0};
+    int stdineof = 0;
+    for(; ;)
+    {
+        if(stdineof == 0)
+            FD_SET(fileno(pf), &rset);
+        FD_SET(sockfd, &rset);
+        int maxfd = (fileno(pf) > sockfd ? fileno(pf) : sockfd) + 1;
+        int ret = select(maxfd, &rset, NULL ,NULL ,NULL);
+        if(ret < 0)
+        {
+            perror("select error");
+            return;
+        }
+        else if(ret == 0)
+        {
+            printf("time out");
+            continue;
+        }
+        if(FD_ISSET(sockfd, &rset))
+        {
+            if(read(sockfd, buf, sizeof(buf) - 1) == 0)
+            {
+                if(stdineof == 1)
+                    return;
+                else
+                {
+                    perror("peer shutdown");
+                    return;
+                }
+            }
+            write(fileno(stdout), buf, strlen(buf));
+            memset(buf, '\0', sizeof(buf));
+        }
+        if(FD_ISSET(fileno(pf), &rset))
+        {
+            if(read(fileno(pf), buf, sizeof(buf) - 1) == 0)
+            {
+                stdineof = 1;
+                shutdown(sockfd, SHUT_WR);
+                FD_CLR(fileno(pf), &rset);
+                continue;
+            }
+            write(sockfd, buf, strlen(buf));
+            memset(buf, '\0', sizeof(buf));
+        }
+    }
+}
 
+
+
+
+
+
+
+#if 0
+#define BUFSIZE 1024
+void str_cli(FILE* pf, int sockfd)
+{
+    fd_set rset;
+    FD_ZERO(&rset);
+    int maxfd = (fileno(pf) > sockfd ? fileno(pf) : sockfd);
+    char sendbuf[BUFSIZE] = {0};
+    char recvbuf[BUFSIZE] = {0};
+    for(; ;)
+    {
+        FD_SET(fileno(pf), &rset);
+        FD_SET(sockfd, &rset);
+        int ret = select(maxfd + 1, &rset, NULL, NULL, NULL);
+        if(ret == 0)
+        {
+            perror("time out");
+            continue;
+        }
+        else if(ret < 0)
+        {
+            perror("select error");
+            return;
+        }
+        if(FD_ISSET(fileno(pf), &rset))
+        {
+            if(NULL == fgets(sendbuf, sizeof(sendbuf) - 1, pf))
+            {
+                return;
+            }
+            if(write(sockfd, sendbuf, strlen(sendbuf)) < 0)
+            {
+                perror("write error");
+                return;
+            }
+        }
+        if(FD_ISSET(sockfd, &rset))
+        {
+            if(0 == read(sockfd, recvbuf, sizeof(recvbuf) - 1))
+            {
+                printf("peer shutdown\n");
+                return ;
+            }
+            fputs(recvbuf, stdout);
+        }
+        memset(sendbuf, '\0', sizeof(sendbuf));
+        memset(recvbuf, '\0', sizeof(recvbuf));
+
+    }
+}
+#endif
+
+
+
+#if 0
 #define BUFSIZE 1024
 void str_cli(FILE* pf, int sockfd)
 {
@@ -71,3 +185,4 @@ void str_cli(FILE* pf, int sockfd)
         bzero(recvbuf, sizeof(recvbuf));
     }
 }
+#endif
